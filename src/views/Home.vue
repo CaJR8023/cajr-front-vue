@@ -16,7 +16,7 @@
           <div class="cajr-user-card block">
             <a class="avator" href="" >
               <img src="https://cdn.sspai.com/2019/09/04/avatar/9b1b1a208ac05861f443e8af528492a6.jpg?imageMogr2/quality/95/thumbnail/!80x80r/gravity/Center/crop/80x80"
-              style="width:40px; height:40;" lazy="loaded"/>
+              style="width:40px; height:40px;" lazy="loaded"/>
             </a>
             <h4><a href="" >{{ item.author.name }}</a></h4>
             <time>一天前</time>
