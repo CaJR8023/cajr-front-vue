@@ -11,11 +11,7 @@ npm install
 
 ### 部分页面展示
 
-![](https://github.com/ragnar-document/ZhihuWeb/blob/master/show/home.png?raw=true)
 
-![](https://github.com/ragnar-document/ZhihuWeb/blob/master/show/zhuanlan.png?raw=true)
-
-页面并非真实设计稿数据目测大小多少存在偏差，并且对布局进行适当的调整
 
 ### 组件
 

@@ -20,13 +20,13 @@ export default [
         title: "主页"
       },
       {
-        path: "/zhihu/find",
+        path: "/cajr/find",
         name: "Find",
         component: Find,
         title: "发现"
       },
       {
-        path: "/zhihu/specials",
+        path: "/cajr/specials",
         name: "Specials",
         component: Specials,
         title: "热榜"
@@ -34,7 +34,7 @@ export default [
     ]
   },
   {
-    path: "/zhihu/zhuanlan",
+    path: "/cajr/zhuanlan",
     name: "Zhuanlan",
     component: Zhuanlan,
     title: "专栏"

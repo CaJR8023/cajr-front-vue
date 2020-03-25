@@ -14,6 +14,8 @@
     "element-ui": "^2.4.5",
     "http-proxy-middleware": "^0.20.0",
     "nprogress": "^0.2.0",
+    "svg-sprite-loader": "^4.2.1",
+    "svgo": "^1.3.2",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
     "webpack-merge": "^4.2.2"
@@ -32,7 +34,8 @@
     "lint-staged": "^8.1.5",
     "prettier": "^1.18.2",
     "vue-cli-plugin-element": "^1.0.1",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "webpack": "^4.42.0"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

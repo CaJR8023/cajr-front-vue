@@ -1,5 +1,5 @@
 <template>
-  <div class="cajr-home-page">
+  <div class="cajr-home-page" style="width: 800px;">
     <el-container>
       <el-main class="cajr-home-main">
         <div class="cajr-main-tabs">
@@ -7,29 +7,44 @@
           <router-link :to="{ name: 'Specials' }">热榜</router-link>
         </div>
         <cajr-loading v-show="loading" />
-        <div class="cajr-main-list" style="overflow:auto;" v-infinite-scroll="render" >
+        <div class="cajr-main-list" style="overflow:auto;">
           <div
             class="cajr-articles-item"
-            v-for="item in recommend"
-            :key="item.question.id"
+            v-for="(item, index) in recommend"
+            :key="index"
           >
-          <div class="cajr-user-card block">
-            <a class="avator" href="" >
-              <img src="https://cdn.sspai.com/2019/09/04/avatar/9b1b1a208ac05861f443e8af528492a6.jpg?imageMogr2/quality/95/thumbnail/!80x80r/gravity/Center/crop/80x80"
-              style="width:40px; height:40px;" lazy="loaded"/>
-            </a>
-            <h4><a href="" >{{ item.author.name }}</a></h4>
-            <time>一天前</time>
-             <div class="more">
-                <el-popover width="80px" trigger="click" >
+            <div class="cajr-user-card block">
+              <a class="avator" href="">
+                <img
+                  src="https://cdn.sspai.com/2019/09/04/avatar/9b1b1a208ac05861f443e8af528492a6.jpg?imageMogr2/quality/95/thumbnail/!80x80r/gravity/Center/crop/80x80"
+                  style="width:40px; height:40px;"
+                  lazy="loaded"
+                />
+              </a>
+              <h4>
+                <a href="">{{ item.author.name }}</a>
+              </h4>
+              <time>一天前</time>
+              <div class="more">
+                <el-popover width="80px" trigger="click">
                   <div style="text-align: center; margin: 0; ">
-                    <a href="javascript:;"  >收藏</a>
+                    <a href="javascript:;">收藏</a>
                     <a href="javascript:;" style="margin-left: 10px">不喜欢</a>
                   </div>
-                  <a href="javascript:;" slot="reference" style="color: #4a4a4a;" ><span class="el-icon-more-outline" style="width: 24px; height: 24px;"></span></a></el-popover>
+                  <a
+                    href="javascript:;"
+                    slot="reference"
+                    style="color: #4a4a4a;"
+                    ><span
+                      class="el-icon-more-outline"
+                      style="width: 24px; height: 24px;"
+                    ></span></a
+                ></el-popover>
+              </div>
             </div>
-          </div>
-            <h3 class="cajr-articles-title"><a href="" >{{ item.question.title }}</a></h3>
+            <h3 class="cajr-articles-title">
+              <a href="">{{ item.question.title }}</a>
+            </h3>
             <div class="cajr-articles-container">
               <div class="cajr-articles-cover" v-if="item.thumbnail">
                 <img :src="item.thumbnail" />
@@ -43,7 +58,7 @@
                   <div class="actions">
                     <span class="like-views">
                       <i class="icon el-icon-view"></i>
-                      <sup>{{item.thanks_count}}</sup>
+                      <sup>{{ item.thanks_count }}</sup>
                     </span>
                     <a href="javascript:;">
                       <i class="icon el-icon-chat-dot-square"></i>
@@ -54,6 +69,12 @@
               </div>
             </div>
           </div>
+          <el-button
+            class="moreBtn"
+            @click="moreData"
+            style="margin:0 auto;display:block;"
+            >{{ moreInfo }}</el-button
+          >
         </div>
       </el-main>
     </el-container>
@@ -69,9 +90,15 @@ export default {
   data() {
     return {
       recommend: [],
-      loading: true
+      moreRecommend: [],
+      loading: true,
+      articleLoading: false,
+      index: 1,
+      init: 4,
+      moreInfo: "查看更多内容 >>"
     };
   },
+  computed: {},
   created() {
     this.render();
   },
@@ -88,13 +115,48 @@ export default {
               return data.target;
             }
           });
-          this.recommend = data;
+          this.moreRecommend = data;
+
+          let init = this.init;
+          let reData = [];
+          for (let i = 0; i < init; i++) {
+            if (data[i] != null) {
+              reData.push(data[i]);
+            }
+          }
+          this.recommend = reData;
           this.loading = false;
+          this.count = data.length;
           console.log(data);
         })
         .catch(err => {
           console.log(err);
         });
+    },
+    moreData() {
+      this.moreInfo = "加载中...";
+      let Data = this.moreRecommend;
+      let index = this.index++;
+      let init = this.init;
+      let num = (index + 1) * init;
+      let Datalength = Data.length;
+      let recommend = [];
+      console.log(num);
+      if (num - 1 <= Datalength) {
+        for (let i = 0; i < num; i++) {
+          if (Data[i] != null) {
+            recommend.push(Data[i]);
+          }
+        }
+        this.recommend = recommend;
+        this.moreInfo = "查看更多内容 >>";
+      } else {
+        this.moreInfo = "没有更多了";
+        this.$message({
+          message: "mock数据有限",
+          type: "warning"
+        });
+      }
     }
   },
   components: {
@@ -104,28 +166,40 @@ export default {
 </script>
 
 <style lang="less">
-.block{
+.block {
   display: block;
 }
-.avator{
+.avator {
   margin-right: 10px;
   display: inline-block;
   vertical-align: middle;
   position: relative;
 }
-a{
+a {
   text-decoration: none;
-  color: #666
+  color: #666;
 }
-a:hover{
+a:hover {
   color: #000;
+}
+
+.moreBtn {
+  border: 1px solid #dbe2e8;
+  box-shadow: 0 1px 2px rgba(46, 61, 73, 0.08);
+  margin-top: 29px;
+  display: block;
+  height: 70px;
+  background-color: #fff;
+  text-align: center;
+  line-height: 70px;
+  width: 100%;
 }
 
 .cajr-home-page {
   .cajr-home-main {
     background-color: #fafbfc;
     margin-right: 14px;
-    padding: 0 ;
+    padding: 0;
     .cajr-main-tabs {
       position: relative;
       height: 50px;
@@ -156,18 +230,18 @@ a:hover{
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         padding: 20px;
         margin: 0 0 20px;
-        transition: border .3s ease-in-out;
-        .cajr-user-card{
-          .avator{
+        transition: border 0.3s ease-in-out;
+        .cajr-user-card {
+          .avator {
             float: left;
           }
-          h4{
+          h4 {
             vertical-align: middle;
             font-weight: 400;
             margin: 0 10px 0 0;
-            font-size: .85rem;
+            font-size: 0.85rem;
             line-height: 1.66666667;
-            a{
+            a {
               color: #4a4a4a;
             }
           }
@@ -178,17 +252,16 @@ a:hover{
             font-size: 0;
             display: block;
           }
-           .more{
+          .more {
             float: right;
             position: relative;
             top: -15px;
-            
           }
-          time{
+          time {
             color: #9b9b9b;
             vertical-align: middle;
             font-size: 12px;
-            font-size: .75rem
+            font-size: 0.75rem;
           }
         }
         .cajr-articles-title {
@@ -196,12 +269,14 @@ a:hover{
           font-size: 1.5rem;
           margin: 0 0 10px;
           line-height: 1.5;
-          a{
-          color: #000;
-          text-decoration: none;
-          transition: 0.3s;
+          a {
+            color: #000;
+            text-decoration: none;
+            transition: 0.3s;
           }
-          a:hover{color: red;}
+          a:hover {
+            color: red;
+          }
         }
         .cajr-articles-container {
           display: flex;
@@ -229,52 +304,52 @@ a:hover{
                 clear: both;
                 font-size: 0;
                 display: block;
-                }
+              }
             }
-            .meta{
-                  clear: both;
-                  margin-top: 22px;
-                  font-size: 14px;
+            .meta {
+              clear: both;
+              margin-top: 22px;
+              font-size: 14px;
+              color: #9b9b9b;
+              .actions {
+                float: right;
+                .icon {
+                  margin-right: 4px;
+                  display: inline-block;
+                  vertical-align: middle;
+                  background-repeat: no-repeat;
+                  background-size: contain;
+                  background-position: 50%;
+                }
+                .like-views {
                   color: #9b9b9b;
-                  .actions{
-                    float: right;
-                    .icon{
-                        margin-right: 4px;
-                        display: inline-block;
-                        vertical-align: middle;
-                        background-repeat: no-repeat;
-                        background-size: contain;
-                        background-position: 50%;
-                      }
-                    .like-views{
-                      color: #9b9b9b;
-                      .cajr-icon-like{
-                        margin-right: 4px;
-                      }
-                      sup{
-                        position: static;
-                        font-size: inherit;
-                        line-height: inherit;
-                        vertical-align: middle;
-                        top: -.5em;
-                      }
-                    }
-                    a{
-                      margin-left: 20px;
-                      color: #666;
-                      text-decoration: none;
-                      padding: 0 5px;
-                      sup{
-                        color: #9b9b9b;
-                        position: static;
-                        font-size: inherit;
-                        line-height: inherit;
-                        vertical-align: middle;
-                        top: -.5em;
-                      }
-                    }
+                  .cajr-icon-like {
+                    margin-right: 4px;
+                  }
+                  sup {
+                    position: static;
+                    font-size: inherit;
+                    line-height: inherit;
+                    vertical-align: middle;
+                    top: -0.5em;
                   }
                 }
+                a {
+                  margin-left: 20px;
+                  color: #666;
+                  text-decoration: none;
+                  padding: 0 5px;
+                  sup {
+                    color: #9b9b9b;
+                    position: static;
+                    font-size: inherit;
+                    line-height: inherit;
+                    vertical-align: middle;
+                    top: -0.5em;
+                  }
+                }
+              }
+            }
           }
         }
       }
