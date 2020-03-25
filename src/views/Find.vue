@@ -25,13 +25,13 @@
 </template>
 <style lang="less">
 .cajr-find-page {
-  width: 680px;
+  width: 780px;
   padding-right: 20px;
   .cajr-find-zhuanti {
     .cajr-zhuanti-title {
       padding-bottom: 20px;
       svg {
-        fill: #0084ff;
+        fill: #000;
       }
       span {
         font-size: 25px;

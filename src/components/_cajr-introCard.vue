@@ -47,10 +47,11 @@ export default {
   justify-content: space-between;
   .cajr-zhuanti-item {
     background-color: #fff;
-    width: 49%;
-    margin-bottom: 10px;
+    width: 48%;
+    margin-bottom: 20px;
     transition: all 0.4s;
     border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
     overflow: hidden;
     &:hover {
       -webkit-box-shadow: 0px 10px 30px -10px rgba(0, 0, 0, 0.3);
@@ -59,7 +60,7 @@ export default {
     .cajr-zhuanti-item-img {
       display: block;
       width: 100%;
-      height: 100px;
+      height: 120px;
     }
     .cajr-zhuanti-item-content {
       padding: 10px;
