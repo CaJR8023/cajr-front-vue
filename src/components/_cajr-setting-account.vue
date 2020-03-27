@@ -128,7 +128,7 @@ export default {
 };
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 .margin-bottom-10 {
   margin-bottom: 10px;
 }
@@ -205,9 +205,6 @@ export default {
       margin-top: 30px;
     }
     .form {
-      .el-input-group__append {
-        text-align: center;
-      }
       .phone-input {
         margin-bottom: 30px;
         line-height: normal;
@@ -216,8 +213,19 @@ export default {
         height: 55px;
         border-collapse: separate;
         border-spacing: 0;
-        input {
-          height: 55px;
+        .el-input-group__prepend {
+          background-color: #f5f5f5;
+          border: 1px solid transparent;
+          width: 30%;
+          text-align: center;
+        }
+      }
+      .code-input {
+        .el-input-group__append {
+          background-color: #f5f5f5;
+          border: 1px solid transparent;
+          width: 30%;
+          text-align: center;
         }
       }
     }

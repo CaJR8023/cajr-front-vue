@@ -621,10 +621,6 @@ export default {
       }
     }
     .form-box {
-      .el-input-group__append {
-        width: 30%;
-        text-align: center;
-      }
       .phone-input {
         margin-bottom: 20px;
         line-height: normal;
@@ -633,6 +629,12 @@ export default {
         height: 55px;
         border-collapse: separate;
         border-spacing: 0;
+        .el-input-group__prepend {
+          width: 30%;
+          background-color: #f5f5f5;
+          border: 1px solid transparent;
+          text-align: center;
+        }
         input {
           height: 55px;
         }
@@ -693,6 +695,12 @@ export default {
         height: 55px;
         border-collapse: separate;
         border-spacing: 0;
+        .el-input-group__append {
+          width: 30%;
+          background-color: #f5f5f5;
+          border: 1px solid transparent;
+          text-align: center;
+        }
         input {
           height: 55px;
         }
