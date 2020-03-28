@@ -16,7 +16,6 @@
 import cajrHeader from "./_cajr-header";
 import cajrAsider from "./_cajr-asider";
 import cajrFooter from "./_cajr-footer";
-
 export default {
   data() {
     return {};
