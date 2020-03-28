@@ -7,8 +7,12 @@
       <div class="authPhone-box">
         <span class="text">15112022009 (已认证)</span>
         <div class="btn-box">
-          <el-button size="small" @click="phoneDialogVisible = true" round
-            >修改</el-button
+          <el-button
+            size="small"
+            @click="phoneDialogVisible = true"
+            round
+            disabled
+            >修 改</el-button
           >
         </div>
       </div>
@@ -18,9 +22,36 @@
         <div class="pwd-update-box">
           <span class="text require">修改登录密码</span>
           <div class="btn-box">
-            <el-button size="small" @click="phoneDialogVisible = true" round
-              >修改</el-button
+            <el-button
+              size="small"
+              @click="phoneDialogVisible = true"
+              v-show="!updatePwdShow"
+              round
+              >修 改</el-button
             >
+          </div>
+        </div>
+        <div v-show="updatePwdShow">
+          <div class="update-pwd-box">
+            <el-input
+              type="text"
+              class="form-item"
+              placeholder="请输入新密码（6 到 16 位）"
+              v-model="newPwd"
+              size="medium"
+            ></el-input>
+          </div>
+          <div class="update-pwd-box" style="margin-top: 10px;">
+            <el-input
+              type="text"
+              class="form-item"
+              placeholder="重新输入新密码（6 到 16 位）"
+              v-model="newPwd2"
+              size="medium"
+            ></el-input>
+          </div>
+          <div class="update-btn-box">
+            <el-button size="small" @click="updatePwd" round>保 存</el-button>
           </div>
         </div>
       </div>
@@ -36,20 +67,19 @@
       <div class="form">
         <el-input v-model="telInput" placeholder="手机号" class="phone-input">
           <el-select v-model="phoneHeaderValue" slot="prepend">
-            <!-- <el-option
-                  v-for="item in phoneHeaderList"
-                  :key="item.phoneHeaderValue"
-                  :label="item.phoneHeaderValue"
-                  :value="item.phoneHeaderValue"
-                >
-                  <span
-                    style="float: left; font-size: 14px; margin-right:2px;"
-                    >{{ item.name }}</span
-                  >
-                  <span style="float: left; color: #8492a6; font-size: 12px"
-                    >({{ item.phoneHeaderValue }})</span
-                  ></el-option
-                > -->
+            <el-option
+              v-for="item in phoneHeaderList"
+              :key="item.phoneHeaderValue"
+              :label="item.phoneHeaderValue"
+              :value="item.phoneHeaderValue"
+            >
+              <span style="float: left; font-size: 14px; margin-right:2px;">{{
+                item.name
+              }}</span>
+              <span style="float: left; color: #8492a6; font-size: 12px"
+                >({{ item.phoneHeaderValue }})</span
+              ></el-option
+            >
           </el-select>
         </el-input>
         <el-input
@@ -78,9 +108,7 @@
         手机不在身边 / 验证身份遇到其他问题？ 请联系 1206303099@qq.com
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="phoneDialogVisible = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="verifyCode">确 定</el-button>
         <el-button type="primary" @click="phoneDialogVisible = false"
           >取 消</el-button
         >
@@ -100,7 +128,40 @@ export default {
       count: "",
       codeInput: "",
       telInput: "",
-      phoneHeaderValue: "+86"
+      updatePwdShow: false,
+      newPwd: "",
+      newPwd2: "",
+      phoneHeaderValue: "+86",
+      phoneHeaderList: [
+        {
+          name: "中国",
+          phoneHeaderValue: "+86"
+        },
+        {
+          name: "美国",
+          phoneHeaderValue: "+1"
+        },
+        {
+          name: "日本",
+          phoneHeaderValue: "+81"
+        },
+        {
+          name: "中国香港",
+          phoneHeaderValue: "+852"
+        },
+        {
+          name: "中国台湾",
+          phoneHeaderValue: "+886"
+        },
+        {
+          name: "澳大利亚",
+          phoneHeaderValue: "+61"
+        },
+        {
+          name: "马来西亚",
+          phoneHeaderValue: "+60"
+        }
+      ]
     };
   },
   methods: {
@@ -123,6 +184,13 @@ export default {
           }
         }, 1000);
       }
+    },
+    verifyCode() {
+      this.updatePwdShow = true;
+      this.phoneDialogVisible = false;
+    },
+    updatePwd() {
+      this.updatePwdShow = false;
     }
   }
 };
@@ -140,6 +208,24 @@ export default {
     background: #fff;
     text-align: center;
     margin-bottom: 12px;
+    .update-pwd-box {
+      padding: 0px 10px;
+      background: #fff;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .update-btn-box {
+      text-align: center;
+      button {
+        color: red;
+        background: #f5f5f5;
+        border: 1px solid transparent;
+        &:hover {
+          color: #fff;
+          background: red;
+        }
+      }
+    }
     .label {
       font-weight: 500;
       font-size: 16px;

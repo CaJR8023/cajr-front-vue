@@ -7,7 +7,7 @@
       <div class="cajr-cardItem-mes">
         {{ item.followers }}人关注 | {{ item.articles_count }}篇文章
       </div>
-      <a class="cajr-greenbtn" href="javascript:;">进入专栏</a>
+      <a class="cajr-blackBtn" href="javascript:;">进入专栏</a>
     </div>
   </div>
 </template>
@@ -58,7 +58,7 @@ export default {
     }
     .cajr-cardItem-intro {
       color: grey;
-      font-size: 14px;
+      font-size: 13px;
       line-height: 21px;
       height: 42px;
       margin-top: 7px;
@@ -73,19 +73,24 @@ export default {
     }
     .cajr-cardItem-mes {
       color: grey;
-      font-size: 14px;
+      font-size: 12px;
       line-height: 21px;
       margin-top: 7px;
     }
-    .cajr-greenbtn {
+    .cajr-blackBtn {
       display: inline-block;
-      border: 1px solid #11a668;
-      color: #11a668;
+      border: 1px solid #b5b5b5;
+      color: #000;
       line-height: 32px;
       font-size: 14px;
       padding: 0 16px;
-      margin-top: 7px;
+      margin-top: 10px;
       border-radius: 4px;
+      &:hover {
+        background: #000;
+        color: #fff;
+        border: 0px;
+      }
     }
   }
 }

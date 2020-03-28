@@ -1,9 +1,9 @@
 <template>
-  <div style="height:100%;background:#fbfbfb;">
+  <div style="height:100%;">
     <cajr-header />
     <div class="cajr-zhuanlan-main">
       <div class="cajr-zhuanlan-banner">
-        <h1 class="cajr-banner-title">知乎专栏</h1>
+        <h1 class="cajr-banner-title">CAJR专栏</h1>
         <p class="cajr-banner-intro">随心写作，自由表达</p>
         <a class="cajr-banner-writerBtn" href="javaScript:;">开始写文章</a>
         <a class="cajr-banner-applyline" href="javaScript:;">申请开通专栏 ></a>
@@ -13,7 +13,7 @@
         <div class="cajr-cardlist">
           <cajr-card :datas="zhuanlanData" />
         </div>
-        <div style="text-align:center;margin-top:20px;">
+        <div style="text-align:center;margin:60px;">
           <a class="cajr-rate-btn" href="javascript:;" @click="rateBtn">
             <span>
               <img src="@/assets/shuaxin.png" />
@@ -22,14 +22,7 @@
           </a>
         </div>
       </div>
-      <div class="cajr-zhuanlan-footer">
-        <h3 class="cajr-zhuanlan-footer-title">在知乎创作</h3>
-        <a class="cajr-gray-btn" href="javascript:;">申请专栏</a>
-        <div class="cajr-zhuanlan-footer-list">
-          © 2019 知乎 · 知乎专栏 · 知乎圆桌·发现 · 移动应用 · 使用机构帐号登录 ·
-          联系我们 · 来知乎工作
-        </div>
-      </div>
+      <cajr-footer />
     </div>
   </div>
 </template>
@@ -37,7 +30,9 @@
 <script>
 import cajrHeader from "./../components/_cajr-header";
 import cajrUserCard from "./../components/_cajr-userCard";
+import cajrFooter from "./../components/_cajr-footer";
 import Server from "../global/request";
+
 export default {
   data() {
     return {
@@ -76,7 +71,8 @@ export default {
   },
   components: {
     "cajr-header": cajrHeader,
-    "cajr-card": cajrUserCard
+    "cajr-card": cajrUserCard,
+    "cajr-footer": cajrFooter
   }
 };
 </script>
@@ -101,7 +97,7 @@ export default {
       width: 100%;
     }
     .cajr-banner-title {
-      background: url("~@/assets/logo.84666bea.png") no-repeat;
+      background: url("~@/assets/zhuanlanCAJR.png") no-repeat;
       background-size: 129px 179px;
       height: 0;
       left: 50%;
@@ -145,7 +141,10 @@ export default {
       margin-left: -36px;
       position: absolute;
       top: 466px;
-      color: #11a668;
+      color: #000;
+      &:hover {
+        color: red;
+      }
     }
   }
 
@@ -170,7 +169,7 @@ export default {
     background: url("~@/assets/bg@2x.033e5b2d.png") repeat-x;
     background-size: 20px 450px;
     .cajr-zhuanlan-footer-title {
-      border: solid #97ffd8;
+      border: solid #000;
       border-width: 1px 0;
       font-size: 18px;
       font-weight: 300;

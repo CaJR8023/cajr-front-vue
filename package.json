@@ -11,8 +11,9 @@
   "dependencies": {
     "axios": "^0.19.0",
     "core-js": "^2.6.5",
+    "el-phone-number-input": "^1.0.4",
     "element-china-area-data": "^4.1.2",
-    "element-ui": "^2.4.5",
+    "element-ui": "^2.13.0",
     "http-proxy-middleware": "^0.20.0",
     "nprogress": "^0.2.0",
     "svg-sprite-loader": "^4.2.1",

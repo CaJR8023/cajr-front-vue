@@ -4,6 +4,7 @@ import Find from "@/views/Find.vue";
 import Specials from "@/views/Specials.vue";
 import Zhuanlan from "@/views/zhuanlan.vue";
 import User from "@/views/User.vue";
+import Article from "@/views/Article.vue";
 import MyBrowseHistory from "@/components/_cajr-browse-history.vue";
 import MyFollow from "@/components/_cajr-my-follow.vue";
 import MyCollect from "@/components/_cajr-my-collect.vue";
@@ -111,5 +112,11 @@ export default [
         title: "账号安全"
       }
     ]
+  },
+  {
+    path: "/cajr/post",
+    name: "Article",
+    component: Article,
+    title: "文章详情"
   }
 ];
