@@ -8,6 +8,7 @@
       </div>
       <cajr-asider />
     </el-container>
+    <el-backtop :bottom="80"></el-backtop>
     <cajr-footer />
   </div>
 </template>

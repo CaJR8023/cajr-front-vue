@@ -107,7 +107,7 @@ export default {
         text-decoration: none;
         padding: 0 16px;
         &.router-link-exact-active {
-          color: #0084ff;
+          color: #000;
         }
       }
     }
@@ -145,7 +145,7 @@ export default {
           &::before {
             display: inline-block;
             content: "";
-            background: url("~@/assets/hot.png") no-repeat;
+            background: url("#") no-repeat;
             background-size: 100%;
             height: 18px;
             width: 18px;
@@ -176,7 +176,7 @@ export default {
               top: -2px;
               font-size: 22px;
               font-weight: 600;
-              color: #0084ff;
+              color: red;
             }
             .articles-content {
               max-height: 105px;

@@ -62,10 +62,7 @@
           icon="el-icon-user"
           style="font-size: 18px;"
           v-show="!hiddenBtn && !isLogin"
-          @click="
-            isDialogShow = true;
-            isLoginDialogShow = true;
-          "
+          @click="login"
           circle
         ></ElButton>
         <el-dropdown v-show="!hiddenBtn && isLogin">
@@ -76,7 +73,7 @@
               src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
           /></a>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>个人中心</el-dropdown-item>
+            <el-dropdown-item @click="user">个人中心</el-dropdown-item>
             <el-dropdown-item>我的关注</el-dropdown-item>
             <el-dropdown-item>我的评论</el-dropdown-item>
             <el-dropdown-item>退出登陆</el-dropdown-item>
@@ -113,10 +110,7 @@
           <div class="text-align-right">
             <el-button
               class="close-btn"
-              @click="
-                isDialogShow = fasle;
-                isLoginDialogShow = true;
-              "
+              @click="close"
               icon="el-icon-close"
               circle
             ></el-button>
@@ -262,7 +256,7 @@
             </el-col>
           </el-row>
         </div>
-        <div class="line"><el-divider></el-divider></div>
+        <div class="msgLine"><el-divider></el-divider></div>
         <div
           slot="footer"
           class="login-dialog-footer"
@@ -305,6 +299,7 @@
 <script>
 import Server from "./../global/request";
 import Router from "./../routes/router";
+
 export default {
   data() {
     return {
@@ -376,17 +371,16 @@ export default {
         let selectData = res.top_search.words;
         this.selectData = selectData;
         let index = Math.floor(Math.random() * selectData.length);
-        let placeholder = selectData[index].display_query;
-        this.placeholder = placeholder;
+        this.placeholder = selectData[index].display_query;
         this.selectData = this.loadAll();
       });
     },
     cajrSelect() {
-      this.hiddenBtn = this.hiddenBtn ? false : true;
+      this.hiddenBtn = !this.hiddenBtn;
     },
     querySearch(queryString, cb) {
-      var selectData = this.selectData;
-      var results = queryString
+      const selectData = this.selectData;
+      const results = queryString
         ? selectData.filter(this.createFilter(queryString))
         : selectData;
       // 调用 callback 返回建议列表的数据
@@ -412,16 +406,17 @@ export default {
     },
     //监听滚动
     getScroll() {
-      if (document.documentElement.scrollTop >= 52) {
-        this.isActive = false;
-      } else {
-        this.isActive = true;
-      }
+      this.isActive = document.documentElement.scrollTop < 52;
     },
-    writerArticle() {},
+    writerArticle() {
+      this.$router.push({ path: "/editor" });
+    },
     query() {
       this.isLogin = true;
-      this.$router.push({ path: "/cajr/find" });
+      this.$router.push({ path: "/search" });
+    },
+    user() {
+      this.$router.push({ path: "/u" });
     },
     sendCode() {
       this.countDown();
@@ -442,6 +437,14 @@ export default {
           }
         }, 1000);
       }
+    },
+    close() {
+      this.isDialogShow = false;
+      this.isLoginDialogShow = true;
+    },
+    login() {
+      this.isDialogShow = true;
+      this.isLoginDialogShow = true;
     }
   },
   components: {}
@@ -707,7 +710,7 @@ export default {
       }
     }
   }
-  .line {
+  .msgLine {
     margin: 0 auto;
     height: 1px;
     margin-top: 20px;

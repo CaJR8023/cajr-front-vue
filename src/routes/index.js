@@ -10,13 +10,14 @@ const appRouter = new Router({
 });
 
 // eslint-disable-next-line
-appRouter.beforeEach((to, from, next) => {
+appRouter.beforeEach((to, _from, next) => {
   NProgress.start();
+  window.document.title = to.meta.title;
   next();
 });
 
 // eslint-disable-next-line
-appRouter.afterEach((to, from) => {
+appRouter.afterEach((_to, _from) => {
   NProgress.done();
 });
 

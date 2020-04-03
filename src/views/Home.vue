@@ -57,11 +57,14 @@
                 <footer class="meta">
                   <div class="actions">
                     <span class="like-views">
-                      <i class="icon el-icon-view"></i>
+                      <i class="icon el-icon-view" style="font-size:18px"></i>
                       <sup>{{ item.thanks_count }}</sup>
                     </span>
                     <a href="javascript:;">
-                      <i class="icon el-icon-chat-dot-square"></i>
+                      <i
+                        class="icon el-icon-chat-dot-square"
+                        style="font-size:18px"
+                      ></i>
                       <sup>{{ item.comment_count }}</sup>
                     </a>
                   </div>

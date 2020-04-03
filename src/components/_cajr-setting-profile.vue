@@ -7,13 +7,15 @@
       </div>
       <div class="handle-box">
         <div class="btn-box">
-          <el-button size="small" @click="deleteImage" round
+          <!-- <el-button size="small" @click="deleteImage" round
             >删除头像</el-button
-          >
+          > -->
         </div>
         <div class="uploadContaner">
           <div class="btn-box">
             <el-upload
+              accept="image/jpeg, image/gif, image/png"
+              ref="upload"
               name="avatarFile"
               action="https://jsonplaceholder.typicode.com/posts/"
               :show-file-list="false"
@@ -72,6 +74,7 @@
           :rows="2"
           placeholder="一句话介绍，让他人快速了解"
           v-model="bio"
+          maxlength="100"
         >
         </el-input>
       </div>
