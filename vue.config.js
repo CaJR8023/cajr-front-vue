@@ -2,9 +2,12 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        target: "http://yapi.weilaigongzuo.com",
-        ws: true,
-        changeOrigin: true
+        target: "http://127.0.0.1:8300",
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {
+          "^/api": ""
+        }
       }
     },
     port: 9000

@@ -142,7 +142,7 @@ export default [
   {
     path: "/editor",
     name: "Editor",
-    meta: { title: "投稿-cajr" },
+    meta: { title: "投稿-cajr", requireAuth: true },
     component: Editor,
     title: "发文章"
   },

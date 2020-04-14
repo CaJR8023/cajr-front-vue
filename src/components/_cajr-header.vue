@@ -11,9 +11,9 @@
       ]"
     >
       <div class="cajr-header-img">
-        <a href=""
-          ><img src="../assets/cajrLogo.png" width="60px" height="60px"
-        /></a>
+        <a href>
+          <img src="../assets/cajrLogo.png" width="60px" height="60px" />
+        </a>
       </div>
       <div class="cajr-header-nav text-align-center">
         <router-link
@@ -61,22 +61,28 @@
           type="primary"
           icon="el-icon-user"
           style="font-size: 18px;"
-          v-show="!hiddenBtn && !isLogin"
-          @click="login"
+          v-if="!isLogin"
+          v-show="!hiddenBtn"
+          @click="loginDialogShow"
           circle
         ></ElButton>
-        <el-dropdown v-show="!hiddenBtn && isLogin">
-          <a href=""
-            ><el-avatar
-              :size="32"
-              style="margin-left:8px"
-              src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-          /></a>
+        <el-dropdown v-else v-show="!hiddenBtn">
+          <a href>
+            <el-avatar :size="32" style="margin-left:8px" :src="avatarUrl" />
+          </a>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click="user">个人中心</el-dropdown-item>
-            <el-dropdown-item>我的关注</el-dropdown-item>
-            <el-dropdown-item>我的评论</el-dropdown-item>
-            <el-dropdown-item>退出登陆</el-dropdown-item>
+            <el-dropdown-item>
+              <a @click="_getUserInfo">个人中心</a>
+            </el-dropdown-item>
+            <el-dropdown-item>
+              <a @click="user">我的关注</a>
+            </el-dropdown-item>
+            <el-dropdown-item>
+              <a @click="user">我的评论</a>
+            </el-dropdown-item>
+            <el-dropdown-item>
+              <a @click="loginOut">退出登陆</a>
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -89,9 +95,9 @@
       ]"
     >
       <div class="cajr-header-hide-img">
-        <a href=""
-          ><img src="../assets/cajrLogo.png" width="60px" height="60px"
-        /></a>
+        <a href>
+          <img src="../assets/cajrLogo.png" width="60px" height="60px" />
+        </a>
       </div>
       <div class="cajr-header-hide-writer">
         <el-button type="primary" size="mini" @click="writerArticle"
@@ -103,7 +109,7 @@
       <el-dialog
         :visible.sync="isDialogShow"
         :show-close="false"
-        top="10vh"
+        top="8vh"
         width="400px"
       >
         <div slot="title">
@@ -126,107 +132,199 @@
             </a>
           </div>
           <div class="form-box" v-show="isLoginDialogShow">
-            <el-input
-              v-model="telInput"
-              placeholder="手机号"
-              class="phone-input"
-            >
-              <el-select v-model="phoneHeaderValue" slot="prepend">
-                <el-option
-                  v-for="item in phoneHeaderList"
-                  :key="item.phoneHeaderValue"
-                  :label="item.phoneHeaderValue"
-                  :value="item.phoneHeaderValue"
-                >
-                  <span
-                    style="float: left; font-size: 14px; margin-right:2px;"
-                    >{{ item.name }}</span
+            <div v-if="isPassword">
+              <el-form
+                ref="passwordLoginForm"
+                :rules="passwordLoginRules"
+                :model="passwordLoginForm"
+              >
+                <el-form-item prop="username">
+                  <el-input
+                    v-model="passwordLoginForm.username"
+                    placeholder="手机号"
+                    class="phone-input"
                   >
-                  <span style="float: left; color: #8492a6; font-size: 12px"
-                    >({{ item.phoneHeaderValue }})</span
-                  ></el-option
-                >
-              </el-select>
-            </el-input>
-            <el-input
-              class="l-password-input"
-              placeholder="密码"
-              v-model="passwordInput"
-              show-password
-            ></el-input>
+                    <el-select v-model="phoneHeaderValue" slot="prepend">
+                      <el-option
+                        v-for="item in phoneHeaderList"
+                        :key="item.phoneHeaderValue"
+                        :label="item.phoneHeaderValue"
+                        :value="item.phoneHeaderValue"
+                      >
+                        <span
+                          style="float: left; font-size: 14px; margin-right:2px;"
+                          >{{ item.name }}</span
+                        >
+                        <span
+                          style="float: left; color: #8492a6; font-size: 12px"
+                          >({{ item.phoneHeaderValue }})</span
+                        >
+                      </el-option>
+                    </el-select>
+                  </el-input>
+                </el-form-item>
+
+                <el-form-item prop="password" v-if="isPassword">
+                  <el-input
+                    class="l-password-input"
+                    placeholder="密码"
+                    v-model="passwordLoginForm.password"
+                    show-password
+                  ></el-input>
+                </el-form-item>
+              </el-form>
+            </div>
+
+            <!-- 验证码登录 -->
+            <div v-else>
+              <el-form
+                ref="smsLoginForm"
+                :rules="smsLoginRules"
+                :model="smsLoginForm"
+              >
+                <el-form-item prop="mobile">
+                  <el-input
+                    v-model="smsLoginForm.mobile"
+                    placeholder="手机号"
+                    class="phone-input"
+                  >
+                    <el-select v-model="phoneHeaderValue" slot="prepend">
+                      <el-option
+                        v-for="item in phoneHeaderList"
+                        :key="item.phoneHeaderValue"
+                        :label="item.phoneHeaderValue"
+                        :value="item.phoneHeaderValue"
+                      >
+                        <span
+                          style="float: left; font-size: 14px; margin-right:2px;"
+                          >{{ item.name }}</span
+                        >
+                        <span
+                          style="float: left; color: #8492a6; font-size: 12px"
+                          >({{ item.phoneHeaderValue }})</span
+                        >
+                      </el-option>
+                    </el-select>
+                  </el-input>
+                </el-form-item>
+
+                <el-form-item prop="inputCode">
+                  <el-input
+                    class="code-input"
+                    placeholder="输入验证码"
+                    v-model="smsLoginForm.inputCode"
+                  >
+                    <el-button
+                      type="text"
+                      slot="append"
+                      @click="sendCodeLogin"
+                      v-if="lCodeShow"
+                      >{{ lVerificationCodeTitle }}</el-button
+                    >
+                    <el-button
+                      type="text"
+                      slot="append"
+                      v-else
+                      style="margin-right: 10px; text-align:center;"
+                      disabled
+                      >{{ loginCount }}s</el-button
+                    >
+                  </el-input>
+                </el-form-item>
+              </el-form>
+            </div>
           </div>
 
           <!-- 注册弹窗 -->
-          <div class="form-box" v-show="!isLoginDialogShow">
-            <el-input
-              v-model="telInput"
-              placeholder="手机号"
-              class="phone-input"
-            >
-              <el-select v-model="phoneHeaderValue" slot="prepend">
-                <el-option
-                  v-for="item in phoneHeaderList"
-                  :key="item.phoneHeaderValue"
-                  :label="item.phoneHeaderValue"
-                  :value="item.phoneHeaderValue"
+          <el-form ref="userForm" :rules="userRules" :model="userForm">
+            <div class="form-box" v-show="!isLoginDialogShow">
+              <el-form-item prop="tel">
+                <el-input
+                  v-model="userForm.tel"
+                  placeholder="手机号"
+                  class="phone-input"
                 >
-                  <span
-                    style="float: left; font-size: 14px; margin-right:2px;"
-                    >{{ item.name }}</span
+                  <el-select v-model="phoneHeaderValue" slot="prepend">
+                    <el-option
+                      v-for="item in phoneHeaderList"
+                      :key="item.phoneHeaderValue"
+                      :label="item.phoneHeaderValue"
+                      :value="item.phoneHeaderValue"
+                    >
+                      <span
+                        style="float: left; font-size: 14px; margin-right:2px;"
+                        >{{ item.name }}</span
+                      >
+                      <span style="float: left; color: #8492a6; font-size: 12px"
+                        >({{ item.phoneHeaderValue }})</span
+                      >
+                    </el-option>
+                  </el-select>
+                </el-input>
+              </el-form-item>
+
+              <el-form-item prop="username">
+                <el-input
+                  class="name-input"
+                  placeholder="昵称"
+                  v-model="userForm.username"
+                ></el-input>
+              </el-form-item>
+
+              <el-form-item prop="password">
+                <el-input
+                  class="r-password-input"
+                  placeholder="密码"
+                  v-model="userForm.password"
+                  show-password
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="rePassword">
+                <el-input
+                  class="re-password-input"
+                  placeholder="再次输入密码"
+                  v-model="userForm.rePassword"
+                  show-password
+                ></el-input>
+              </el-form-item>
+              <el-form-item prop="regCode">
+                <el-input
+                  class="code-input"
+                  placeholder="输入验证码"
+                  v-model="userForm.regCode"
+                >
+                  <el-button
+                    type="text"
+                    slot="append"
+                    @click="sendCodeReg"
+                    v-if="rCodeShow"
+                    >{{ RVerificationCodeTitle }}</el-button
                   >
-                  <span style="float: left; color: #8492a6; font-size: 12px"
-                    >({{ item.phoneHeaderValue }})</span
-                  ></el-option
-                >
-              </el-select>
-            </el-input>
-            <el-input
-              class="name-input"
-              placeholder="昵称"
-              v-model="nameInput"
-            ></el-input>
-            <el-input
-              class="r-password-input"
-              placeholder="密码"
-              v-model="rPasswordInput"
-              show-password
-            ></el-input>
-            <el-input
-              class="re-password-input"
-              placeholder="再次输入密码"
-              v-model="rePasswordInput"
-              show-password
-            ></el-input>
-            <el-input
-              class="code-input"
-              placeholder="输入验证码"
-              v-model="codeInput"
-            >
-              <el-button
-                type="text"
-                slot="append"
-                @click="sendCode"
-                v-show="codeShow"
-                >{{ verificationCodeTitle }}</el-button
-              >
-              <el-button
-                type="text"
-                slot="append"
-                v-show="!codeShow"
-                style="margin-right: 10px"
-                disabled
-                >{{ count }}s</el-button
-              >
-            </el-input>
-            <el-checkbox v-model="checked" style="margin-bottom: 20px;">
-              我已经阅读并同意《<a href="javascript:;">用户协议</a
-              >》</el-checkbox
-            >
-          </div>
+                  <el-button
+                    type="text"
+                    slot="append"
+                    v-else
+                    style="margin-right: 10px"
+                    disabled
+                    >{{ regCount }}s</el-button
+                  >
+                </el-input>
+              </el-form-item>
+              <el-checkbox v-model="checked" style="margin-bottom: 20px;">
+                我已经阅读并同意《
+                <a href="javascript:;">用户协议</a>》
+              </el-checkbox>
+            </div>
+          </el-form>
 
           <el-row v-show="isLoginDialogShow">
             <el-col style="padding-top: 7px; width:50%;">
-              <a href="javascript:;" class="">忘记密码？</a>
+              <a href="javascript:;" @click="isPasswordLogin" v-if="!isPassword"
+                >密码登录</a
+              >
+              <a href="javascript:;" @click="isPassword = false" v-else
+                >验证码登录</a
+              >
             </el-col>
             <el-col style="text-align: right; width:50%; padding-top: 1px;">
               <el-button
@@ -236,7 +334,12 @@
                 round
                 >注 册</el-button
               >
-              <el-button size="mini" class="login-btn" style="color:red; " round
+              <el-button
+                size="mini"
+                class="login-btn"
+                style="color:red; "
+                @click="login"
+                round
                 >登 陆</el-button
               >
             </el-col>
@@ -245,18 +348,25 @@
           <!-- 注册按钮 -->
           <el-row v-show="!isLoginDialogShow">
             <el-col style="padding-top: 7px; width:50%;">
-              <a href="javascript:;" @click="isLoginDialogShow = true" class=""
+              <a href="javascript:;" @click="isLoginDialogShow = true" class
                 >返回登陆</a
               >
             </el-col>
             <el-col style="text-align: right; width:50%; padding-top: 1px;">
-              <el-button size="mini" class="login-btn" style="color:red; " round
+              <el-button
+                size="mini"
+                class="login-btn"
+                style="color:red; "
+                @click="register"
+                round
                 >注 册</el-button
               >
             </el-col>
           </el-row>
         </div>
-        <div class="msgLine"><el-divider></el-divider></div>
+        <div class="msgLine">
+          <el-divider></el-divider>
+        </div>
         <div
           slot="footer"
           class="login-dialog-footer"
@@ -269,10 +379,18 @@
             其他登陆方式
           </p>
           <div class="other-login">
-            <a href="javascript:;"><img src="../assets/wechat.png"/></a>
-            <a href="javascript:;"><img src="../assets/github.png"/></a>
-            <a href="javascript:;"><img src="../assets/QQ.png"/></a>
-            <a href="javascript:;"><img src="../assets/weibo.png"/></a>
+            <a href="javascript:;">
+              <img src="../assets/wechat.png" />
+            </a>
+            <a href="javascript:;">
+              <img src="../assets/github.png" />
+            </a>
+            <a href="javascript:;">
+              <img src="../assets/QQ.png" />
+            </a>
+            <a href="javascript:;">
+              <img src="../assets/weibo.png" />
+            </a>
           </div>
         </div>
 
@@ -297,8 +415,9 @@
 </template>
 
 <script>
-import Server from "./../global/request";
 import Router from "./../routes/router";
+import Common from "./../global/common";
+import Serve from "@/global/request";
 
 export default {
   data() {
@@ -312,8 +431,28 @@ export default {
       scrollHeight: 0,
       isActive: true,
       isDialogShow: false,
-      telInput: "",
-      passwordInput: "",
+      passwordLoginForm: {
+        username: "",
+        password: "",
+        grant_type: "password"
+      },
+      smsLoginForm: {
+        inputCode: "",
+        mobile: ""
+      },
+      passwordLoginRules: {
+        username: [
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          { min: 11, max: 11, message: "请输入正确的手机号", trigger: "blur" }
+        ],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }]
+      },
+      smsLoginRules: {
+        inputCode: [
+          { required: true, message: "请输入验证码", trigger: "blur" }
+        ],
+        mobile: [{ required: true, message: "请输入手机号", trigger: "blur" }]
+      },
       phoneHeaderValue: "+86",
       phoneHeaderList: [
         {
@@ -347,19 +486,41 @@ export default {
       ],
       isLoginDialogShow: true,
       isLogin: false,
-      nameInput: "",
-      rPasswordInput: "",
-      rePasswordInput: "",
-      codeInput: "",
       timer: null,
-      count: "",
-      codeShow: true,
-      verificationCodeTitle: "发送验证码",
-      checked: false
+      regCount: "",
+      loginCount: "",
+      lCodeShow: true,
+      rCodeShow: true,
+      lVerificationCodeTitle: "发送验证码",
+      RVerificationCodeTitle: "发送验证码",
+      checked: true,
+      isPassword: false,
+      avatarUrl: Common.ossDefaultAvatar,
+      userForm: {
+        username: "",
+        tel: "",
+        password: "",
+        rePassword: "",
+        regCode: ""
+      },
+      userRules: {
+        username: [
+          { required: true, message: "请输入用户名", trigger: "blur" }
+        ],
+        tel: [
+          { required: true, message: "请输入手机号", trigger: "blur" },
+          { min: 11, max: 11, message: "请输入正确的手机号", trigger: "blur" }
+        ],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        rePassword: [
+          { required: true, message: "请再次输入密码", trigger: "blur" }
+        ]
+      }
     };
   },
   created() {
     this.render();
+    this.isLoginStatus();
     this.navlist = Router[0].children;
   },
   mounted() {
@@ -367,13 +528,18 @@ export default {
   },
   methods: {
     render() {
-      Server.select().then(res => {
+      Serve.select().then(res => {
         let selectData = res.top_search.words;
         this.selectData = selectData;
         let index = Math.floor(Math.random() * selectData.length);
         this.placeholder = selectData[index].display_query;
         this.selectData = this.loadAll();
       });
+    },
+    isLoginStatus() {
+      if (localStorage.getItem("token")) {
+        this.isLogin = true;
+      }
     },
     cajrSelect() {
       this.hiddenBtn = !this.hiddenBtn;
@@ -409,7 +575,13 @@ export default {
       this.isActive = document.documentElement.scrollTop < 52;
     },
     writerArticle() {
-      this.$router.push({ path: "/editor" });
+      if (this.$store.getters.token) {
+        this.$message.success("你已经登录");
+        this.$router.push({ path: "/editor" });
+      } else {
+        // eslint-disable-next-line no-undef
+        isDialogShow = true;
+      }
     },
     query() {
       this.isLogin = true;
@@ -418,33 +590,211 @@ export default {
     user() {
       this.$router.push({ path: "/u" });
     },
-    sendCode() {
-      this.countDown();
+    sendCodeLogin() {
+      if (this.smsLoginForm.mobile == "") {
+        this.$message.warning("请输入手机号");
+      } else {
+        if (
+          this.smsLoginForm.mobile.length > 11 ||
+          this.smsLoginForm.mobile.length < 11
+        ) {
+          this.$message.warning("请输入正确的手机号");
+          return false;
+        }
+
+        this.sendCode(this.smsLoginForm.mobile);
+      }
     },
-    countDown() {
-      const TIME_COUNT = 30;
+    sendCode(data) {
+      Serve.sendCode(data).then(res => {
+        if (res.data === 1) {
+          this.$message.success("发送成功");
+          this.countDownLogin();
+        } else {
+          this.$message.error("发送验证码失败");
+        }
+      });
+    },
+    countDownLogin() {
+      const TIME_COUNT = 60;
       if (!this.timer) {
-        this.count = TIME_COUNT;
-        this.codeShow = false;
+        this.loginCount = TIME_COUNT;
+        this.lCodeShow = false;
         this.timer = setInterval(() => {
-          if (this.count > 0 && this.count <= TIME_COUNT) {
-            this.count--;
+          if (this.loginCount > 0 && this.loginCount <= TIME_COUNT) {
+            this.loginCount--;
           } else {
-            this.codeShow = true;
+            this.lCodeShow = true;
             clearInterval(this.timer);
             this.timer = null;
-            this.verificationCodeTitle = "重新发送";
+            this.lVerificationCodeTitle = "重新发送";
           }
         }, 1000);
       }
     },
+    sendCodeReg() {
+      if (this.userForm.tel == "") {
+        this.$message.warning("请输入手机号");
+      } else {
+        if (this.userForm.tel.length > 11 || this.userForm.tel.length < 11) {
+          this.$message.warning("请输入正确的手机号");
+          return false;
+        }
+        this.sendCode(this.userForm.tel);
+      }
+    },
+    countDownReg() {
+      const TIME_COUNT = 60;
+      if (!this.timer) {
+        this.regCount = TIME_COUNT;
+        this.rCodeShow = false;
+        this.timer = setInterval(() => {
+          if (this.regCount > 0 && this.regCount <= TIME_COUNT) {
+            this.regCount--;
+          } else {
+            this.rCodeShow = true;
+            clearInterval(this.timer);
+            this.timer = null;
+            this.rVerificationCodeTitle = "重新发送";
+          }
+        }, 1000);
+      }
+    },
+
     close() {
       this.isDialogShow = false;
       this.isLoginDialogShow = true;
     },
-    login() {
+    loginDialogShow() {
       this.isDialogShow = true;
       this.isLoginDialogShow = true;
+    },
+    login() {
+      let form = "smsLoginForm";
+      if (this.isPassword) {
+        form = "passwordLoginForm";
+      }
+      this.$refs[form].validate(valid => {
+        if (valid) {
+          console.info("success");
+          if (this.isPassword) {
+            this._passwordLogin();
+          } else {
+            this._smsLogin();
+          }
+        } else {
+          console.info("fail");
+          return;
+        }
+      });
+    },
+    _passwordLogin() {
+      this.$store
+        .dispatch("user/_passwordLogin", this.passwordLoginForm)
+        // eslint-disable-next-line no-unused-vars
+        .then(res => {
+          this.$message.success("登录成功!");
+          this.isDialogShow = false;
+          this.isLogin = true;
+          this._getUserInfo(this.passwordLoginForm.username);
+        })
+        .catch(error => {
+          console.info(error);
+          this.$message.error("手机号或密码错误");
+        });
+    },
+    _smsLogin() {
+      this.$store
+        .dispatch("user/_smsLogin", this.smsLoginForm)
+        // eslint-disable-next-line no-unused-vars
+        .then(res => {
+          this.$message.success("登录成功!");
+          this.isDialogShow = false;
+          this.isLogin = true;
+        })
+        // eslint-disable-next-line no-unused-vars
+        .catch(error => {
+          this.$message.error("验证码错误");
+        });
+    },
+    isPasswordLogin() {
+      this.isPassword = true;
+    },
+    loginOut() {
+      this.$message.success("你已安全退出!");
+      this.$store.dispatch("user/loginOut");
+      this.$router.go(0);
+      this.isLogin = false;
+    },
+    _getUserInfo(data) {
+      Serve.getUserInfo(data)
+        .then(res => {
+          console.info(res.data);
+        })
+        .catch(error => {
+          console.info(error);
+        });
+    },
+    verifyCode() {
+      // this.sendCodeReg();
+      if (this.userForm.regCode == "") {
+        this.$message.warning("验证码不能为空");
+        return false;
+      }
+      if (
+        this.userForm.regCode.length > 4 ||
+        this.userForm.regCode.length < 4
+      ) {
+        this.$message.warning("验证码为4位数字");
+        return false;
+      }
+      return (
+        Serve.veridyCode(this.userForm)
+          .then(res => {
+            if (res.data == 1) {
+              this.$message.success("验证码校验成功");
+              return true;
+            } else {
+              this.$message.warning("验证码错误，请重新发送验证码");
+              return false;
+            }
+          })
+          // eslint-disable-next-line no-unused-vars
+          .catch(error => {
+            this.$message.error("注册失败");
+          })
+      );
+    },
+    async register() {
+      this.$refs["userForm"].validate(async valid => {
+        if (valid) {
+          if (this.userForm.password != this.userForm.rePassword) {
+            this.$message.warning("两次输入的密码不一致");
+            return;
+          }
+          const verifyCodeIsSuccess = await this.verifyCode();
+          console.info("verifyCodeIsSuccess =>" + verifyCodeIsSuccess);
+          if (verifyCodeIsSuccess) {
+            const data = await this._register();
+            if (data) {
+              this.smsLoginForm.mobile = this.userForm.tel;
+              this.smsLoginForm.inputCode = this.userForm.regCode;
+              this._smsLogin();
+            }
+          }
+        } else {
+          return;
+        }
+      });
+    },
+    _register() {
+      return Serve.register(this.userForm).then(res => {
+        if (res.data == 1) {
+          return true;
+        }
+        this.$message.warning(res.msg);
+        return false;
+      });
     }
   },
   components: {}
@@ -452,6 +802,9 @@ export default {
 </script>
 
 <style lang="less">
+.form-box .el-form-item {
+  margin-bottom: 15px !important;
+}
 .text-align-center {
   text-align: center;
 }

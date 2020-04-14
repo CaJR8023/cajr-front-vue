@@ -20,6 +20,18 @@ const Serve = {
   },
   zhuanlanCard() {
     return Axios.get(API.zhuanlanCard);
+  },
+  sendCode(params) {
+    return Axios.get(API.sendCode(params));
+  },
+  getUserInfo(params) {
+    return Axios.get(API.getUserInfo(params));
+  },
+  veridyCode(params) {
+    return Axios.get(API.verifyCode, params);
+  },
+  register(data) {
+    return Axios.post(API.register, data);
   }
 };
 

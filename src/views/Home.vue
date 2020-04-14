@@ -43,7 +43,9 @@
               </div>
             </div>
             <h3 class="cajr-articles-title">
-              <a href="">{{ item.question.title }}</a>
+              <a href="javascript:;" @click="articleDetails">{{
+                item.question.title
+              }}</a>
             </h3>
             <div class="cajr-articles-container">
               <div class="cajr-articles-cover" v-if="item.thumbnail">
@@ -160,6 +162,9 @@ export default {
           type: "warning"
         });
       }
+    },
+    articleDetails() {
+      this.$router.push({ path: "/post", query: 1 });
     }
   },
   components: {

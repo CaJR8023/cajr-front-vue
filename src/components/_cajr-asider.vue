@@ -23,7 +23,7 @@
         <div class="infoFooter">
           <span class="num">100人关注</span>
           <div class="action">
-            <el-button size="mini" round>进入</el-button>
+            <el-button size="mini" @click="goColumn" round>进入</el-button>
           </div>
         </div>
       </div>
@@ -59,6 +59,7 @@
           round
           v-for="item in hotTagData"
           :key="item.name"
+          @click="goTag"
           >#{{ item.name }}</el-button
         >
       </div>
@@ -137,6 +138,14 @@ export default {
         }
       ]
     };
+  },
+  methods: {
+    goColumn() {
+      this.$router.push({ path: "/column" });
+    },
+    goTag() {
+      this.$router.push({ path: "/tag" });
+    }
   },
   components: {}
 };
