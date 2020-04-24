@@ -30,6 +30,7 @@
             <div class="btn-box">
               <el-button
                 type="button"
+                v-if="isMyself"
                 @click="editBtn"
                 class="cajr-default cajr-small"
                 size="mini"
@@ -72,14 +73,30 @@ export default {
       navlist: [],
       Data: [],
       followUserData: [],
-      index: 1
+      index: 1,
+      isMyself: false,
+      isLogin: false
     };
   },
   created() {
+    this.loginStatus();
     this.render();
     this.navlist = Router[2].children;
   },
   methods: {
+    loginStatus() {
+      if (localStorage.getItem("isLogin") == "true") {
+        this.isLogin = true;
+        this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        console.log(this.userInfo);
+        this.avatar = this.$store.getters.ossImgUrl + this.userInfo.avatar;
+        this.isMyself = this.$route.params.id = localStorage.getItem("userId")
+          ? true
+          : false;
+      } else {
+        this.isLogin = false;
+      }
+    },
     render() {
       Server.zhuanlanCard().then(res => {
         this.Data = res.data;

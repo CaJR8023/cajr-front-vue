@@ -1,7 +1,13 @@
 <template>
   <div class="article-list">
     <div class="article-item" v-for="item in datas" :key="item.title">
-      <img class="article-item-img" :src="item.banner" alt />
+      <img
+        class="article-item-img"
+        :src="item.banner"
+        v-if="item.existBanner"
+        alt
+      />
+      <img class="article-item-img" :src="item.banner" v-else alt />
       <div class="article-item-content">
         <div>
           <h3 class="article-item-title">{{ item.title }}</h3>
@@ -10,14 +16,14 @@
               <div class="pic_box">
                 <img src="../assets/github.png" />
                 <span class="name">
-                  <span class="text_ellipsis">CAJR</span>
+                  <span class="text_ellipsis">{{ item.source }}</span>
                 </span>
                 <i
                   class="el-icon-view"
                   style="font-size:18px; margin-left: 80px;"
                 ></i>
                 <span class="name" style="margin-left: 4px;">{{
-                  item.view_count
+                  item.visitorCount
                 }}</span>
               </div>
             </a>

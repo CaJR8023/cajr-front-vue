@@ -22,14 +22,19 @@
                 />
               </a>
               <h4>
-                <a href="">{{ item.author.name }}</a>
+                <a href="">{{ item.source }}</a>
               </h4>
-              <time>一天前</time>
+              <time>{{ item.time }}</time>
               <div class="more">
                 <el-popover width="80px" trigger="click">
                   <div style="text-align: center; margin: 0; ">
-                    <a href="javascript:;">收藏</a>
-                    <a href="javascript:;" style="margin-left: 10px">不喜欢</a>
+                    <a href="javascript:;" @click="collect(item.id)">收藏</a>
+                    <a
+                      href="javascript:;"
+                      style="margin-left: 10px"
+                      @click="unLike(item.id)"
+                      >不喜欢</a
+                    >
                   </div>
                   <a
                     href="javascript:;"
@@ -43,31 +48,37 @@
               </div>
             </div>
             <h3 class="cajr-articles-title">
-              <a href="javascript:;" @click="articleDetails">{{
-                item.question.title
+              <a href="javascript:;" @click="articleDetails(item.id)">{{
+                item.title
               }}</a>
             </h3>
             <div class="cajr-articles-container">
-              <div class="cajr-articles-cover" v-if="item.thumbnail">
-                <img :src="item.thumbnail" />
+              <div class="cajr-articles-cover" v-if="item.existBanner">
+                <img :src="item.banner" />
               </div>
               <div class="cajr-articles-content">
                 <div class="articles-content">
-                  {{ item.excerpt }}
+                  {{ item.desc }}
                 </div>
                 <!-- <el-button type="text">阅读全文</el-button> -->
                 <footer class="meta">
                   <div class="actions">
                     <span class="like-views">
                       <i class="icon el-icon-view" style="font-size:18px"></i>
-                      <sup>{{ item.thanks_count }}</sup>
+                      <sup v-if="item.visitorCount <= 998">{{
+                        item.visitorCount
+                      }}</sup>
+                      <sup v-else>999+</sup>
                     </span>
                     <a href="javascript:;">
                       <i
                         class="icon el-icon-chat-dot-square"
                         style="font-size:18px"
                       ></i>
-                      <sup>{{ item.comment_count }}</sup>
+                      <sup v-if="item.reviewCount <= 998">{{
+                        item.reviewCount
+                      }}</sup>
+                      <sup v-else>999+</sup>
                     </a>
                   </div>
                 </footer>
@@ -88,8 +99,8 @@
 
 <script>
 // @ is an alias to /src
-import Server from "../global/request";
 import loading from "../components/_cajr-loading";
+import Serve from "../global/request";
 export default {
   name: "home",
   data() {
@@ -99,8 +110,9 @@ export default {
       loading: true,
       articleLoading: false,
       index: 1,
-      init: 4,
-      moreInfo: "查看更多内容 >>"
+      init: 10,
+      moreInfo: "查看更多内容 >>",
+      page: 1
     };
   },
   computed: {},
@@ -112,14 +124,10 @@ export default {
       this.hiddenBtn = this.hiddenBtn ? false : true;
     },
     render() {
-      Server.recommend()
+      Serve.newestNewsVisitor(this.page)
         .then(res => {
           console.log(res);
-          let data = res.data.map(data => {
-            if (data.target.question) {
-              return data.target;
-            }
-          });
+          let data = res.list;
           this.moreRecommend = data;
 
           let init = this.init;
@@ -139,32 +147,42 @@ export default {
         });
     },
     moreData() {
-      this.moreInfo = "加载中...";
-      let Data = this.moreRecommend;
-      let index = this.index++;
-      let init = this.init;
-      let num = (index + 1) * init;
-      let Datalength = Data.length;
-      let recommend = [];
-      console.log(num);
-      if (num - 1 <= Datalength) {
-        for (let i = 0; i < num; i++) {
-          if (Data[i] != null) {
-            recommend.push(Data[i]);
+      this.loading = true;
+      this.page++;
+      Serve.newestNewsVisitor(this.page)
+        .then(res => {
+          let data = res.list;
+          if (data.length <= 0) {
+            this.moreInfo = "没有更多了";
           }
-        }
-        this.recommend = recommend;
-        this.moreInfo = "查看更多内容 >>";
-      } else {
-        this.moreInfo = "没有更多了";
-        this.$message({
-          message: "mock数据有限",
-          type: "warning"
+          let init = this.init;
+          for (let i = 0; i < init; i++) {
+            if (data[i] != null) {
+              this.recommend.push(data[i]);
+            }
+          }
+          this.loading = false;
+        })
+        .catch(err => {
+          console.log(err);
         });
+    },
+    articleDetails(id) {
+      this.$router.push({ path: `/post/${id}` });
+    },
+    collect(newsId) {
+      if (localStorage.getItem("isLogin") == "true") {
+        console.log(newsId);
+      } else {
+        this.$emit("isLoginDialogShow", true);
       }
     },
-    articleDetails() {
-      this.$router.push({ path: "/post", query: 1 });
+    unLike(newsId) {
+      if (localStorage.getItem("isLogin") == "true") {
+        console.log(newsId);
+      } else {
+        this.$emit("isLoginDialogShow", true);
+      }
     }
   },
   components: {
@@ -205,10 +223,10 @@ a:hover {
 
 .cajr-home-page {
   .cajr-home-main {
-    background-color: #fafbfc;
     margin-right: 14px;
     padding: 0;
     .cajr-main-tabs {
+      background-color: #ffffff;
       position: relative;
       height: 50px;
       border: 1px solid #eee;
@@ -220,7 +238,7 @@ a:hover {
         content: "";
         width: 100%;
         height: 10px;
-        background-color: #fafbfc;
+        background-color: #fff;
       }
       a {
         color: #666;
@@ -233,6 +251,7 @@ a:hover {
     }
     .cajr-main-list {
       .cajr-articles-item {
+        background-color: #ffffff;
         border: 1px solid #eee;
         border-radius: 4px;
         box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);

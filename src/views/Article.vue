@@ -1,25 +1,25 @@
 <template>
   <div class="cajr-article-page" style=" background-color: #fff;">
-    <cajr-header></cajr-header>
+    <cajr-header ref="articleHeader"></cajr-header>
     <div class="postPage articlel-wrapper">
       <div class="article-detail">
         <article class="normal-article">
           <div class="article-header normal" id="aHeader">
-            <div class="greyBox" v-show="isBanner"></div>
+            <div class="greyBox" v-show="newsData.existBanner"></div>
             <div
               class="article-banner"
               style="width:710px; height: 354px;"
               v-show="isBanner"
             >
               <img
-                src="https://cdn.sspai.com/2020/03/26/9a4638c9daba3bddb2a2b3344ba5d09f.jpg?imageMogr2/quality/95/thumbnail/!1420x708r/gravity/Center/crop/1420x708/interlace/1"
+                :src="newsData.banner"
                 class="banner"
                 style="width:710px; height: 354px"
               />
             </div>
             <div class="articleWidth-content">
               <div class="article-title" id="articleTitle">
-                修改 AirDrop 文件存放位置
+                {{ newsData.title }}
               </div>
               <div class="article-author">
                 <div class="author-box" style="min-width: 400px;">
@@ -33,49 +33,25 @@
                       </a>
                     </div>
                     <a href="javascript:;" target="_blank">
-                      <span class="nickname">CAJR</span>
+                      <span class="nickname">{{ newsData.source }}</span>
                     </a>
                   </div>
                 </div>
-                <div class="timer">两天前</div>
+                <div class="timer">{{ newsData.time }}</div>
               </div>
             </div>
           </div>
           <div class="article-body" id="aBody">
             <div class="articleWidth-content">
               <div class="content wangEditor-txt minHeight">
-                <p>
-                  2016 年和 2017
-                  年我出去玩都有尝试过随身携带本子记手帐，记录每天的花销，顺便画一下旅途中的事物，既可以方便回来之后总结账单，也可以起到纪念的作用。但是随身掏出本子来画画实际用在我四处乱走一通的旅行当中，先不说画的质量和需要的时间，可能还存在着更多使用场景上的困难，比如在摇摇晃晃的公交车上，或者在拥挤的地铁里，都不太适合把本子掏出来做记录，脑瓜子不太中用的时刻，可能下一秒就忘了刚刚灵光一闪想要画下来的东西，也很可能不记得刚刚花了多少钱以及买了什么。
-                </p>
-                <p>
-                  2018 年我买了 iPad
-                  Pro，也在旅途手帐上做了一个新的尝试——电子手帐，我用 iPad Pro
-                  在熊掌记上写旅行日记，把每天的见闻记下来，以插入照片的形式记账，感觉效果也还是蛮不错的。现在想一下唯一的缺点就是总结账单的时候还是需要手工重新计算一遍。
-                </p>
-                <p>
-                  十一去台湾玩，我尝试了一下新的电子化流程，背在包里随时准备拿出来写随笔的
-                  iPad Pro 和键盘也被手机代替了—— Scannable + Timi
-                  时光记账是我现在的全新选择。
-                </p>
-                <p>
-                  <img src="../assets/iphone.jpg" />
-                </p>
-                <p>
-                  十一去台湾玩，我尝试了一下新的电子化流程，背在包里随时准备拿出来写随笔的
-                  iPad Pro 和键盘也被手机代替了—— Scannable + Timi
-                  时光记账是我现在的全新选择。
-                </p>
-                <p>
-                  十一去台湾玩，我尝试了一下新的电子化流程，背在包里随时准备拿出来写随笔的
-                  iPad Pro 和键盘也被手机代替了—— Scannable + Timi
-                  时光记账是我现在的全新选择。
+                <p v-for="item in newsContent" :key="item" v-html="item">
+                  {{ item }}
                 </p>
               </div>
             </div>
             <div style="border: 1px solid transparent;"></div>
             <div class="article-side" style="left: 424.5px;" id="aSide">
-              <div class="star-btn">
+              <div class="star-btn" @click="star">
                 <i
                   class="el-icon-star-off"
                   style="color:#ffa902; font-size:25px; padding:10px; cursor: pointer;"
@@ -88,14 +64,14 @@
                   style="color: #4c4e4d; font-size:25px; padding:10px; cursor: pointer;"
                 ></i>
               </div>
-              <div class="count">8</div>
+              <div class="count">{{ newsData.reviewCount }}</div>
               <div class="item">
                 <i
                   class="el-icon-share"
                   style="font-size:25px; color: #4c4e4d; cursor: pointer;"
                 ></i>
               </div>
-              <div class="item">
+              <div class="item" @click="collect">
                 <i
                   class="el-icon-collection-tag"
                   style="color: #4c4e4d; font-size:25px; padding:10px; cursor: pointer;"
@@ -105,14 +81,9 @@
           </div>
           <div class="article-tag articleWidth-content-687" id="article-tag">
             <div class="tag-container">
-              <div class="tag-item">
+              <div class="tag-item" v-for="tag in tags" :key="tag">
                 <a href="javascript:;" class="tag">
-                  <span class="sub">#</span>macOS
-                </a>
-              </div>
-              <div class="tag-item">
-                <a href="javascript:;" class="tag">
-                  <span class="sub">#</span>一日一记
+                  <span class="sub">#</span>{{ tag }}
                 </a>
               </div>
             </div>
@@ -138,12 +109,12 @@
                   <div class="container">
                     <div class="top">
                       <a href="javascript:;" target="_blank">
-                        <span class="nickname">CAJR</span>
+                        <span class="nickname">{{ newsData.source }}</span>
                       </a>
                     </div>
                     <div class="bio">这个人很懒～</div>
                     <div class="btn-box left-4">
-                      <el-button size="mini" round>关 注</el-button>
+                      <el-button size="mini" @click="follow">关 注</el-button>
                     </div>
                   </div>
                 </div>
@@ -155,7 +126,9 @@
           <div class="comment">
             <div class="comment-container" id="article-comment-box">
               <div class="comment-header">
-                <div class="comment-title">全部评论（4）</div>
+                <div class="comment-title">
+                  全部评论（{{ reviewData.length }}）
+                </div>
                 <div class="review-box">
                   <div>
                     热门排序
@@ -174,14 +147,32 @@
                         >
                           <a href="javascript:;" target="_blank">
                             <img
-                              src="../assets/github.png"
+                              v-if="isLogin"
+                              :src="avatar"
+                              style="width:32px; height:32px; border-radius:32px;"
+                            />
+                            <img
+                              v-else
+                              src="../assets/defualtAvatar.png"
                               style="width:32px; height:32px; border-radius:32px;"
                             />
                           </a>
                         </div>
                       </div>
-                      <div class="txt input-txt" @click="commmentBoxShow">
+                      <div
+                        class="txt input-txt"
+                        @click="commmentBoxShow"
+                        v-if="isLogin"
+                      >
                         写下你的评论
+                      </div>
+                      <div class="txt input-txt" v-else>
+                        请在<a
+                          href="javascript:;"
+                          style="color:red;"
+                          @click="commentStatus"
+                          >登录</a
+                        >后评论...
                       </div>
                     </div>
                     <div class="comment-box" v-show="isShowCommentBox">
@@ -195,14 +186,20 @@
                         @blur.prevent="isShowCommentBox = false"
                       ></textarea>
                       <div class="handle-box">
-                        <el-button size="mini" round>评论</el-button>
+                        <el-button size="mini" @click="review" round
+                          >评论</el-button
+                        >
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               <div class="comment-list-box">
-                <div class="cajr-commentList comment-list">
+                <div
+                  class="cajr-commentList comment-list"
+                  v-for="review in reviewData"
+                  :key="review.id"
+                >
                   <div class="comment-container-box">
                     <div class="comment-user">
                       <div class="header-box">
@@ -210,9 +207,12 @@
                           class="cajr-portrait header-img"
                           style="height: 40px;"
                         >
-                          <a href="javascript:;" target="_blank">
+                          <a
+                            :href="'/u/' + review.userOther.id"
+                            target="_blank"
+                          >
                             <img
-                              src="../assets/github.png"
+                              :src="ossImgUrl + review.userOther.avatar"
                               style="width:32px; height:32px; border-radius:32px;"
                             />
                           </a>
@@ -221,7 +221,12 @@
                       <div class="user-box">
                         <div class="between">
                           <div class="flex-start">
-                            <a class="name">CAJR</a>
+                            <a
+                              class="name"
+                              href="javascript:;"
+                              @click="goUser(review.userOther.id)"
+                              >{{ review.userOther.username }}</a
+                            >
                           </div>
                         </div>
                         <div class="time-box text-ellipsis"></div>
@@ -231,7 +236,9 @@
                       <div class="comment-content">
                         <div class="comment-txt">
                           <div>
-                            <div class="wangEditor-txt">Comment content</div>
+                            <div class="wangEditor-txt">
+                              {{ review.content }}
+                            </div>
                           </div>
                         </div>
                         <div class="article-icon-box">
@@ -241,19 +248,24 @@
                                 class="el-icon-chat-round"
                                 @click="showCallTextArea"
                               ></i>
-                              <span class="name">2</span>
+                              <span class="name">{{
+                                review.replyList.length
+                              }}</span>
                             </div>
                             <div class="pic-box">
-                              <i class="el-icon-caret-top"></i>
-                              <span class="name">2</span>
+                              <i
+                                class="el-icon-caret-top"
+                                style="color:red;"
+                              ></i>
+                              <span class="name">{{ review.likeNum }}</span>
                             </div>
                             <div class="pic-box">
                               <i class="el-icon-caret-bottom"></i>
-                              <span class="name">2</span>
+                              <span class="name">{{ review.unlikeNum }}</span>
                             </div>
                           </div>
                           <div class="pic-box">
-                            <span class="time">2小时前</span>
+                            <span class="time">{{ review.time }}</span>
                           </div>
                         </div>
                       </div>
@@ -261,7 +273,11 @@
                   </div>
                   <div class="comment-content-box">
                     <div class="comment-child-box">
-                      <div class="comment-child-item">
+                      <div
+                        class="comment-child-item"
+                        v-for="reply in review.replyList"
+                        :key="reply.id"
+                      >
                         <div class="comment-user">
                           <div class="header-box">
                             <div
@@ -270,7 +286,7 @@
                             >
                               <a href="javascript:;" target="_blank">
                                 <img
-                                  src="../assets/github.png"
+                                  :src="ossImgUrl + reply.userOther.avatar"
                                   style="width:32px; height:32px; border-radius:32px;"
                                 />
                               </a>
@@ -279,82 +295,18 @@
                           <div class="user-box">
                             <div class="between">
                               <div class="flex-start">
-                                <a class="name">CAJR</a>
-                              </div>
-                            </div>
-                            <div class="time-box text-ellipsis"></div>
-                          </div>
-                        </div>
-                        <div class="comment-content-box">
-                          <div class="comment-content">
-                            <div class="comment-txt">
-                              <div>
-                                <div class="wangEditor-txt">
-                                  Child Comment content
-                                </div>
-                              </div>
-                            </div>
-                            <div class="article-icon-box">
-                              <div class="article-handle-box">
-                                <div class="pic-box">
-                                  <i
-                                    class="el-icon-chat-round"
-                                    @click="showCallTextArea"
-                                  ></i>
-                                  <span class="name">1</span>
-                                </div>
-                                <div class="pic-box">
-                                  <i class="el-icon-caret-top"></i>
-                                  <span class="name">1</span>
-                                </div>
-                                <div class="pic-box">
-                                  <i class="el-icon-caret-bottom"></i>
-                                  <span class="name">0</span>
-                                </div>
-                              </div>
-                              <div class="pic-box">
-                                <span class="time">1小时前</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Child comment -->
-                    <div class="comment-child-box" style>
-                      <div class="comment-child-item">
-                        <div class="comment-user">
-                          <div class="header-box">
-                            <div
-                              class="cajr-portrait header-img"
-                              style="height: 40px;"
-                            >
-                              <a href="javascript:;" target="_blank">
-                                <img
-                                  src="../assets/QQ.png"
-                                  style="width:32px; height:32px; border-radius:32px;"
-                                />
-                              </a>
-                            </div>
-                          </div>
-                          <div class="user-box">
-                            <div class="between">
-                              <div class="flex-start">
-                                <a
-                                  class="name"
-                                  href="javascript:;"
-                                  target="_blank"
-                                  >CAJR</a
-                                >
-                                <div>
+                                <a class="name">{{
+                                  reply.userOther.username
+                                }}</a>
+                                <div v-if="reply.repliedUserOther.id > 0">
                                   &nbsp;
                                   <span class="txt">回复</span> &nbsp;
                                   <a
                                     class="txt"
                                     href="javascript:;"
                                     target="_blank"
-                                    >CAJR</a
-                                  >
+                                    >{{ reply.repliedUserOther.username }}
+                                  </a>
                                 </div>
                               </div>
                             </div>
@@ -366,7 +318,7 @@
                             <div class="comment-txt">
                               <div>
                                 <div class="wangEditor-txt">
-                                  Child Comment content
+                                  {{ reply.content }}
                                 </div>
                               </div>
                             </div>
@@ -377,19 +329,23 @@
                                     class="el-icon-chat-round"
                                     @click="showCallTextArea"
                                   ></i>
-                                  <span class="name">1</span>
                                 </div>
                                 <div class="pic-box">
-                                  <i class="el-icon-caret-top"></i>
-                                  <span class="name">1</span>
+                                  <i
+                                    class="el-icon-caret-top"
+                                    style="color:red;"
+                                  ></i>
+                                  <span class="name">{{ reply.likeNum }}</span>
                                 </div>
                                 <div class="pic-box">
                                   <i class="el-icon-caret-bottom"></i>
-                                  <span class="name">0</span>
+                                  <span class="name">{{
+                                    reply.unlikeNum
+                                  }}</span>
                                 </div>
                               </div>
                               <div class="pic-box">
-                                <span class="time">1小时前</span>
+                                <span class="time">{{ reply.time }}</span>
                               </div>
                             </div>
                           </div>
@@ -478,7 +434,7 @@
 import cajrHeader from "./../components/_cajr-header";
 import cajrFooter from "./../components/_cajr-footer";
 import cajrRecCard from "./../components/_cajr-article-card";
-import Server from "../global/request";
+import Serve from "../global/request";
 
 export default {
   data() {
@@ -487,18 +443,48 @@ export default {
       isShowCommentBox: false,
       isUserComment: false,
       isShowCall: false,
-      articleRecData: []
+      articleRecData: [],
+      newsData: {},
+      newsContent: [],
+      userInfo: {},
+      tags: [],
+      avatar: "",
+      isLogin: false,
+      reviewData: [],
+      ossImgUrl: ""
     };
   },
   created() {
+    this.loginStatus();
+    this.newsDetails();
+    this.getNewsReview();
     this.render();
+    this.ossImgUrl = this.$store.getters.ossImgUrl;
   },
   mounted() {
     window.addEventListener("scroll", this.getScroll);
   },
   methods: {
+    loginStatus() {
+      if (localStorage.getItem("isLogin") == "true") {
+        this.isLogin = true;
+        this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        console.log(this.userInfo);
+        this.avatar = this.$store.getters.ossImgUrl + this.userInfo.avatar;
+      } else {
+        this.isLogin = false;
+      }
+    },
+    newsDetails() {
+      Serve.getOneNews(this.$route.params.id).then(res => {
+        this.newsData = res;
+        this.newsContent = res.contentList;
+        this.isBanner = res.existBanner;
+        this.tags = res.tags;
+      });
+    },
     render() {
-      Server.newsSpecialsList().then(res => {
+      Serve.newsSpecialsList().then(res => {
         let data = [];
         for (let i = 0; i < 6; i++) {
           data.push(res.data[i]);
@@ -506,6 +492,16 @@ export default {
         console.info(data);
         this.articleRecData = data;
       });
+    },
+    getNewsReview() {
+      let newsId = this.$route.params.id;
+      Serve.getNewsReview(newsId)
+        .then(res => {
+          this.reviewData = res.data;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     getScroll() {
       var aHeader = document.getElementById("aHeader");
@@ -525,11 +521,46 @@ export default {
       this.isShowCommentBox = true;
     },
     showCallTextArea() {
-      this.isShowCall = true;
       document.getElementById("callTextArea").focus();
+      this.isShowCall = true;
     },
+    comment() {},
     rollComment() {
       document.getElementById("comment").scrollIntoView();
+    },
+    commentStatus() {
+      this.$refs.articleHeader._isLoginDialogShow();
+    },
+    follow() {
+      if (localStorage.getItem("isLogin") === "true") {
+        console.log();
+      } else {
+        this.$refs.articleHeader._isLoginDialogShow();
+      }
+    },
+    star() {
+      // eslint-disable-next-line no-empty
+      if (this.isLogin) {
+      } else {
+        this.$refs.articleHeader._isLoginDialogShow();
+      }
+    },
+    collect() {
+      // eslint-disable-next-line no-empty
+      if (this.isLogin) {
+      } else {
+        this.$refs.articleHeader._isLoginDialogShow();
+      }
+    },
+    review() {
+      // eslint-disable-next-line no-empty
+      if (this.isLogin) {
+      } else {
+        this.$refs.articleHeader._isLoginDialogShow();
+      }
+    },
+    goUser(userId) {
+      this.$router.push({ path: `/u/${userId}` });
     }
   },
   components: {

@@ -10,6 +10,5 @@ export function smsLogin(data) {
   return Axios.login(url, data);
 }
 export function getInfo(data) {
-  const url = API.getUserInfo;
-  return Axios.get(url, data);
+  return Axios.get(API.getUserInfo(data));
 }

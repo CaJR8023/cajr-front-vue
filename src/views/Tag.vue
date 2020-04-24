@@ -3,14 +3,15 @@
     <cajr-header></cajr-header>
     <div class="tag-page">
       <div class="head">
-        <span class="text">CAJR 标签🏷</span>
+        <span class="text">{{ tag.name }}🏷</span>
       </div>
       <div class="container">
-        <div class="count">相关文章 56 篇</div>
+        <div class="count">相关文章 {{ tag.newsNum }} 篇</div>
         <div class="content">
           <div class="article">
             <cajr-article-card :datas="articleTagData"></cajr-article-card>
             <el-button
+              v-show="isMoreDataBtnShow"
               @click="moreData"
               style="margin:10px auto;display:block;"
               round
@@ -102,29 +103,32 @@
 </template>
 
 <script>
-import Server from "../global/request";
 import cajrHeader from "./../components/_cajr-header";
 import cajrFooter from "./../components/_cajr-footer";
 import cajrArticleCard from "./../components/_cajr-article-card";
+import Serve from "../global/request";
 
 export default {
   data() {
     return {
-      articleTagData: []
+      articleTagData: [],
+      tagId: 0,
+      tag: {},
+      isMoreDataBtnShow: false
     };
   },
   created() {
-    this.render();
+    this.initTagInfo();
   },
   methods: {
-    render() {
-      Server.newsSpecialsList().then(res => {
-        let data = [];
-        for (let i = 0; i < 14; i++) {
-          data.push(res.data[i]);
+    initTagInfo() {
+      this.tagId = this.$route.params.id;
+      Serve.getOneTag(this.tagId).then(res => {
+        this.tag = res.data;
+        this.articleTagData = res.data.newsList;
+        if (this.articleTagData.length >= 6) {
+          this.isMoreDataBtnShow = true;
         }
-        console.info(data);
-        this.articleTagData = data;
       });
     },
     moreData() {}

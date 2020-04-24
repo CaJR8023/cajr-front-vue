@@ -11,7 +11,7 @@
       <div class="cajr-24hour-intro">
         <br />
       </div>
-    </div> -->
+    </div>-->
     <div class="cajr-asider-zhuanlan">
       <img src="../assets/zhuanlan.jpg" class="zhuanlanImage" />
       <div style="padding: 16px 20px 20px; margin:0;" class="aboutInfo">
@@ -36,13 +36,18 @@
           :interval="5000"
           indicator-position="outside"
         >
-          <el-carousel-item v-for="item in projectData" :key="item.id">
-            <a :href="item.url">
+          <section
+            v-loading="HoursNewsCardLoading"
+            style="text-align: center; margin: 0 auto; padding: 50px;"
+            v-show="HoursNewsCardLoading"
+          />
+          <el-carousel-item v-for="item in data24HoursNews" :key="item.id">
+            <a href="javascript:;" @click="newsDetails(item.id)">
               <div class="cajr-24hour-list">
                 <div class="cajr-24hour-item">
                   <div class="cajr-24hour-item-img">
-                    <img src="../assets/test.jpg" />
-                    <span class="cajr-24hour-item-name">{{ item.name }}</span>
+                    <img :src="item.banner" />
+                    <span class="cajr-24hour-item-name">{{ item.title }}</span>
                   </div>
                 </div>
               </div>
@@ -54,12 +59,18 @@
     <div class="cajr-asider-tag">
       <div class="cajr-tag-title">热门标签</div>
       <div class="cajr-tag-details">
+        <section
+          v-loading="tagCardLoading"
+          style="text-align: center; margin: 0 auto; padding: 35px;"
+          v-show="tagCardLoading"
+        />
         <el-button
           style="margin-top:5px;"
           round
+          size="small"
           v-for="item in hotTagData"
           :key="item.name"
-          @click="goTag"
+          @click="goTag(item.id)"
           >#{{ item.name }}</el-button
         >
       </div>
@@ -69,9 +80,9 @@
       <div style="padding: 14px;" class="aboutInfo">
         <span>关于我们</span>
         <br />
-        <span class="info"
-          >毕业设计作品，不作商用<br />
-          github: https://github.com/CaJR8023
+        <span class="info">
+          毕业设计作品，不作商用
+          <br />github: https://github.com/CaJR8023
         </span>
       </div>
     </div>
@@ -79,72 +90,55 @@
 </template>
 
 <script>
+import Serve from "../global/request";
+
 export default {
   data() {
     return {
-      projectData: [
-        {
-          id: 1,
-          name: "OPPO Find X2 Pro 深度影像评测",
-          intro: "贫穷限制了我的想象，美国的有钱人如何防范新冠病毒？",
-          inn: "Node.js/vue.js/小程序/elementUI",
-          url: "../assets/test.jpg"
-        },
-        {
-          id: 2,
-          name: "OPPO Find X2 Pro 深度影像评测",
-          intro: "后台增删改项目",
-          inn: "node.js/koa/vue.js/ElementUI",
-          url: "../assets/about.png"
-        },
-        {
-          id: 3,
-          name: "OPPO Find X2 Pro 深度影像评测",
-          intro: "类似于todolist的小程序",
-          inn: "node.js/koa/小程序",
-          url: "../assets/about.png"
-        },
-        {
-          id: 4,
-          name: "OPPO Find X2 Pro 深度影像评测",
-          intro: "一个某课卖99的简单小程序",
-          inn: "小程序",
-          url: "../assets/about.png"
-        },
-        {
-          id: 5,
-          name: "OPPO Find X2 Pro 深度影像评测",
-          intro: "一个某课卖99的简单小程序",
-          inn: "小程序",
-          url: "../assets/about.png"
-        }
-      ],
-      hotTagData: [
-        {
-          name: "OPPO Find X2 Pro",
-          url: "https://go.sspai.com/matrix"
-        },
-        {
-          name: "肺炎",
-          url: "https://go.sspai.com/matrix"
-        },
-        {
-          name: "学医",
-          url: "https://go.sspai.com/matrix"
-        },
-        {
-          name: "椭圆机",
-          url: "https://go.sspai.com/matrix"
-        }
-      ]
+      data24HoursNews: [],
+      hotTagData: [],
+      tagCardLoading: false,
+      HoursNewsCardLoading: false
     };
   },
+  created() {
+    this.initHottestTag();
+    this.get24Hours();
+  },
+  mounted() {
+    this.tagCardLoading = true;
+    this.HoursNewsCardLoading = true;
+  },
   methods: {
-    goColumn() {
-      this.$router.push({ path: "/column" });
+    initHottestTag() {
+      Serve.hottestTag().then(res => {
+        this.hotTagData = res.data;
+        this.tagCardLoading = false;
+      });
     },
-    goTag() {
-      this.$router.push({ path: "/tag" });
+    get24Hours() {
+      Serve.get24HoursNews()
+        .then(res => {
+          this.data24HoursNews = res.data;
+          this.HoursNewsCardLoading = false;
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+    goColumn(id) {
+      this.$router.push({
+        path: "/column",
+        params: {
+          id: id
+        }
+      });
+    },
+    goTag(id) {
+      this.$router.push({ path: `/tag/${id}` });
+    },
+    newsDetails(id) {
+      this.$router.push({ path: `/post/${id}` });
     }
   },
   components: {}
@@ -153,10 +147,10 @@ export default {
 
 <style lang="less">
 .cajr-asider {
-  background-color: #fafbfc;
   margin-top: 20px;
   height: 100%;
   .cajr-asider-zhuanlan {
+    background-color: #fff;
     border: 1px solid #eee;
     border-radius: 4px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -215,6 +209,7 @@ export default {
     }
   }
   .cajr-asider-userInfo {
+    background-color: #fff;
     border: 1px solid #eee;
     border-radius: 4px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -248,6 +243,7 @@ export default {
     }
   }
   .cajr-asider-24hour {
+    background-color: #fff;
     border: 1px solid #eee;
     border-radius: 4px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -272,8 +268,8 @@ export default {
           }
           .cajr-24hour-item-name {
             color: #fff;
-            font-size: 14px;
-            font-weight: 400;
+            font-size: 13px;
+            font-weight: 500;
             position: absolute;
             top: 115px;
             left: 10px;
@@ -293,6 +289,7 @@ export default {
   }
 
   .cajr-asider-tag {
+    background-color: #fff;
     border: 1px solid #eee;
     border-radius: 4px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -315,6 +312,7 @@ export default {
     }
   }
   .cajr-asider-about {
+    background-color: #fff;
     border: 1px solid #eee;
     border-radius: 4px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);

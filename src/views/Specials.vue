@@ -145,7 +145,7 @@ export default {
           &::before {
             display: inline-block;
             content: "";
-            background: url("#") no-repeat;
+            background: url("../assets/hot.png") no-repeat;
             background-size: 100%;
             height: 18px;
             width: 18px;

@@ -44,7 +44,7 @@
               <time>117 篇文章</time>
             </div>
           </section>
-          <h4>专栏作者（20人）</h4>
+          <h4>专栏作者（2 人）</h4>
           <div class="user-list">
             <div class="user-card block">
               <a href="/user/933272" class="avatar">

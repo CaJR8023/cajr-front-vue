@@ -72,13 +72,13 @@
           </a>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
-              <a @click="_getUserInfo">个人中心</a>
+              <a @click="user(userInfo.userId)">个人中心</a>
             </el-dropdown-item>
             <el-dropdown-item>
-              <a @click="user">我的关注</a>
+              <a @click="goMyAttention(userInfo.userId)">我的关注</a>
             </el-dropdown-item>
             <el-dropdown-item>
-              <a @click="user">我的评论</a>
+              <a @click="goMyReview(userInfo.userId)">我的评论</a>
             </el-dropdown-item>
             <el-dropdown-item>
               <a @click="loginOut">退出登陆</a>
@@ -420,6 +420,7 @@ import Common from "./../global/common";
 import Serve from "@/global/request";
 
 export default {
+  inject: ["reload"],
   data() {
     return {
       hiddenBtn: false,
@@ -515,7 +516,8 @@ export default {
         rePassword: [
           { required: true, message: "请再次输入密码", trigger: "blur" }
         ]
-      }
+      },
+      userInfo: {}
     };
   },
   created() {
@@ -537,8 +539,13 @@ export default {
       });
     },
     isLoginStatus() {
-      if (localStorage.getItem("token")) {
+      if (localStorage.getItem("isLogin") == "true") {
         this.isLogin = true;
+        this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        console.log(this.userInfo);
+        this.avatarUrl = this.$store.getters.ossImgUrl + this.userInfo.avatar;
+      } else {
+        this.isLogin = false;
       }
     },
     cajrSelect() {
@@ -574,21 +581,32 @@ export default {
     getScroll() {
       this.isActive = document.documentElement.scrollTop < 52;
     },
+    _isLoginDialogShow() {
+      this.isDialogShow = true;
+      this.isActive = true;
+    },
     writerArticle() {
-      if (this.$store.getters.token) {
+      if (this.isLogin) {
         this.$message.success("你已经登录");
         this.$router.push({ path: "/editor" });
       } else {
         // eslint-disable-next-line no-undef
-        isDialogShow = true;
+        this.isDialogShow = true;
+        this.isActive = true;
       }
     },
     query() {
-      this.isLogin = true;
       this.$router.push({ path: "/search" });
     },
-    user() {
-      this.$router.push({ path: "/u" });
+    user(id) {
+      console.log(id);
+      this.$router.push({ path: `/u/${id}` });
+    },
+    goMyAttention(userId) {
+      this.$router.push({ path: `/u/${userId}/follow` });
+    },
+    goMyReview(userId) {
+      this.$router.push({ path: `/u/${userId}/review` });
     },
     sendCodeLogin() {
       if (this.smsLoginForm.mobile == "") {
@@ -664,6 +682,7 @@ export default {
     close() {
       this.isDialogShow = false;
       this.isLoginDialogShow = true;
+      this.isActive = document.documentElement.scrollTop < 52;
     },
     loginDialogShow() {
       this.isDialogShow = true;
@@ -692,11 +711,16 @@ export default {
       this.$store
         .dispatch("user/_passwordLogin", this.passwordLoginForm)
         // eslint-disable-next-line no-unused-vars
-        .then(res => {
+        .then(async res => {
           this.$message.success("登录成功!");
-          this.isDialogShow = false;
-          this.isLogin = true;
-          this._getUserInfo(this.passwordLoginForm.username);
+          const isGetUserInfo = await this._getUserInfo(
+            this.passwordLoginForm.username
+          );
+          if (isGetUserInfo) {
+            this.isDialogShow = false;
+            this.isLogin = true;
+            this.$router.go(0);
+          }
         })
         .catch(error => {
           console.info(error);
@@ -711,6 +735,7 @@ export default {
           this.$message.success("登录成功!");
           this.isDialogShow = false;
           this.isLogin = true;
+          this.$router.go(0);
         })
         // eslint-disable-next-line no-unused-vars
         .catch(error => {
@@ -727,9 +752,13 @@ export default {
       this.isLogin = false;
     },
     _getUserInfo(data) {
-      Serve.getUserInfo(data)
+      return Serve.getUserInfo(data)
         .then(res => {
           console.info(res.data);
+          localStorage.setItem("userId", res.data.id);
+          localStorage.setItem("userName", res.data.id);
+          localStorage.setItem("isLogin", true);
+          return true;
         })
         .catch(error => {
           console.info(error);
@@ -824,12 +853,11 @@ export default {
 .input-with-select .el-input-group__prepend {
   background-color: rgb(12, 11, 11);
 }
-
 .cajr-home-header {
   height: 60px;
   width: 100%;
   overflow: hidden;
-  z-index: 100;
+  z-index: 200;
   background-color: #fff;
   box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);
   -webkit-box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);

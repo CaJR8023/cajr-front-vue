@@ -1,6 +1,6 @@
 import Layout from "@/components/_cajr-layout.vue";
 import Home from "@/views/Home.vue";
-import Find from "@/views/Find.vue";
+// import Find from "@/views/Find.vue";
 import Specials from "@/views/Specials.vue";
 import Zhuanlan from "@/views/zhuanlan.vue";
 import User from "@/views/User.vue";
@@ -38,13 +38,13 @@ export default [
         component: Home,
         title: "主页"
       },
-      {
-        path: "/cajr/find",
-        name: "Find",
-        meta: { title: "发现-cajr" },
-        component: Find,
-        title: "发现"
-      },
+      // {
+      //   path: "/cajr/find",
+      //   name: "Find",
+      //   meta: { title: "发现-cajr" },
+      //   component: Find,
+      //   title: "发现"
+      // },
       {
         path: "/cajr/specials",
         name: "Specials",
@@ -62,7 +62,7 @@ export default [
     title: "主页专栏"
   },
   {
-    path: "/u",
+    path: "/u/:id",
     name: "User",
     component: User,
     title: "用户个人中心",
@@ -71,39 +71,39 @@ export default [
     },
     children: [
       {
-        path: "/u/like",
+        path: "/u/:id/like",
         name: "MyCollect",
-        meta: { title: "我的收藏-cajr" },
+        meta: { title: "收藏-cajr" },
         component: MyCollect,
-        title: "我的收藏"
+        title: "收藏"
       },
       {
-        path: "/u/acticle",
+        path: "/u/:id/article",
         name: "MyArticle",
-        meta: { title: "我的文章-cajr" },
+        meta: { title: "文章-cajr" },
         component: MyArticle,
-        title: "我的文章"
+        title: "文章"
       },
       {
-        path: "/u/browse",
+        path: "/u/:id/browse",
         name: "MyBrowseHistory",
         meta: { title: "浏览历史-cajr" },
         component: MyBrowseHistory,
         title: "浏览历史"
       },
       {
-        path: "/u/follow",
+        path: "/u/:id/follow",
         name: "MyFollow",
-        meta: { title: "我的关注-cajr" },
+        meta: { title: "关注-cajr" },
         component: MyFollow,
-        title: "我的关注"
+        title: "关注"
       },
       {
-        path: "/u/review",
+        path: "/u/:id/review",
         name: "MyReview",
-        meta: { title: "我的评论-cajr" },
+        meta: { title: "评论-cajr" },
         component: MyReview,
-        title: "我的评论"
+        title: "评论"
       }
     ]
   },
@@ -133,7 +133,7 @@ export default [
     ]
   },
   {
-    path: "/post",
+    path: "/post/:id",
     name: "Article",
     meta: { title: "文章详情-cajr" },
     component: Article,
@@ -180,7 +180,7 @@ export default [
     ]
   },
   {
-    path: "/tag",
+    path: "/tag/:id",
     name: "Tag",
     meta: { title: "标签-cajr" },
     component: Tag,

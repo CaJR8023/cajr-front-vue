@@ -1,10 +1,10 @@
 <template>
   <div>
-    <cajr-header />
+    <cajr-header ref="header" />
     <el-container class="cajr-main">
       <div style="padding-top:20px;width:100%">
         <!-- Main content -->
-        <router-view></router-view>
+        <router-view @isLoginDialogShow="isLoginDialogShow"></router-view>
       </div>
       <cajr-asider />
     </el-container>
@@ -20,6 +20,13 @@ import cajrFooter from "./_cajr-footer";
 export default {
   data() {
     return {};
+  },
+  methods: {
+    isLoginDialogShow(data) {
+      if (data) {
+        this.$refs.header._isLoginDialogShow();
+      }
+    }
   },
   components: {
     "cajr-header": cajrHeader,
