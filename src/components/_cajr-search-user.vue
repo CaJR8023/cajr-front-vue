@@ -2,7 +2,10 @@
   <div class="search-container">
     <div class="search-content">
       <div class="user">
-        <cajr-search-user-card></cajr-search-user-card>
+        <cajr-search-user-card
+          :keyWord="searchInput"
+          ref="searchUser"
+        ></cajr-search-user-card>
       </div>
       <div class="right">
         <div class="cajr-hot-article">
@@ -65,8 +68,18 @@
 import cajrUserCard from "./../components/_cajr-search-user-card";
 
 export default {
+  props: ["searchInput"],
   data() {
     return {};
+  },
+  created() {},
+  methods: {
+    search() {
+      this.$refs.searchUser.search();
+    },
+    login() {
+      this.$parent.login();
+    }
   },
   components: {
     "cajr-search-user-card": cajrUserCard

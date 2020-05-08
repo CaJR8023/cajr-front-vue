@@ -4,20 +4,23 @@
     style="max-width: 800px; padding:16px 0; min-height: 378px;"
   >
     <div class="u-review-list">
-      <div class="u-review-item">
+      <div class="u-review-item" v-for="item in reviewList" :key="item.id">
         <div class="title-box">
           <div class="left">
             <div class="title">
               <div class="cajr-portrait" style="height: 32px;">
-                <img src="../assets/github.png" />
+                <img :src="ossUrl + item.userOther.avatar" />
               </div>
-              <span class="name">CAJR</span>
+              <span class="name">{{ item.userOther.username }}</span>
             </div>
             <div class="memo">
-              评论了 &nbsp; <span class="nicknameEllip">SpencerWoo</span>&nbsp;
-              的文章
+              评论了 &nbsp;
+              <span class="nicknameEllip">{{
+                item.news.userOther.username
+              }}</span
+              >&nbsp; 的文章
             </div>
-            <div class="time">03/24</div>
+            <div class="time">{{ item.time }}</div>
           </div>
         </div>
         <div class="review-box">
@@ -28,15 +31,14 @@
             ></i>
             <div class="comment-content">
               <div class="txt">
-                <span>哈哈哈哈</span>
+                <span>{{ item.content }}</span>
               </div>
               <div class="article-title-box">
                 <div class="title-name">
                   标题：
-                  <a href="javascript:;" target="_blank"
-                    >《用 Substats 和 Shields.io
-                    为你的个人主页定制动态数据小牌子》</a
-                  >
+                  <a :href="/post/ + item.news.id" target="_blank">{{
+                    item.news.title
+                  }}</a>
                 </div>
               </div>
             </div>
@@ -44,15 +46,40 @@
         </div>
       </div>
       <div style="clear:both;" />
-      <div class="loadingMore">加载更多</div>
+      <div class="loadingMore">{{ moreDataInfo }}</div>
     </div>
   </div>
 </template>
 
 <script>
+import Serve from "@/global/request";
 export default {
+  props: ["userId"],
   data() {
-    return {};
+    return {
+      loading: false,
+      reviewList: [],
+      userIdReq: {
+        userId: 0
+      },
+      ossUrl: "",
+      moreDataInfo: "加载更多"
+    };
+  },
+  created() {
+    this.getData();
+    this.ossUrl = this.$store.getters.ossImgUrl;
+    if (this.reviewList.length < 1) {
+      this.moreDataInfo = "没有更多数据了";
+    }
+  },
+  methods: {
+    getData() {
+      this.userIdReq.userId = this.userId;
+      Serve.userReview(this.userIdReq).then(res => {
+        this.reviewList = res.data;
+      });
+    }
   }
 };
 </script>
@@ -64,7 +91,7 @@ export default {
   max-width: 800px;
   width: 100%;
   .u-review-item {
-    margin-bottom: 22px;
+    margin-bottom: 10px;
     .title-box {
       -webkit-box-pack: justify;
       -ms-flex-pack: justify;
@@ -92,15 +119,13 @@ export default {
         }
         .memo {
           line-height: 32px;
-          .nicknameEllip {
-          }
         }
       }
       .name {
         color: #292525;
         margin-left: 10px;
         margin-right: 14px;
-        font-weight: 350;
+        font-weight: 300;
       }
       .time {
         margin-left: 487px;
@@ -154,7 +179,7 @@ export default {
     font-size: 14px;
     height: 60px;
     line-height: 60px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 }
 </style>

@@ -14,15 +14,15 @@
             :key="index"
           >
             <div class="cajr-user-card block">
-              <a class="avator" href="">
+              <a class="avator" href>
                 <img
-                  src="https://cdn.sspai.com/2019/09/04/avatar/9b1b1a208ac05861f443e8af528492a6.jpg?imageMogr2/quality/95/thumbnail/!80x80r/gravity/Center/crop/80x80"
+                  :src="ossImgUrl + item.userOther.avatar"
                   style="width:40px; height:40px;"
                   lazy="loaded"
                 />
               </a>
               <h4>
-                <a href="">{{ item.source }}</a>
+                <a href>{{ item.userOther.username }}</a>
               </h4>
               <time>{{ item.time }}</time>
               <div class="more">
@@ -40,34 +40,42 @@
                     href="javascript:;"
                     slot="reference"
                     style="color: #4a4a4a;"
-                    ><span
+                  >
+                    <span
                       class="el-icon-more-outline"
                       style="width: 24px; height: 24px;"
-                    ></span></a
-                ></el-popover>
+                    ></span>
+                  </a>
+                </el-popover>
               </div>
             </div>
             <h3 class="cajr-articles-title">
-              <a href="javascript:;" @click="articleDetails(item.id)">{{
-                item.title
-              }}</a>
+              <a
+                href="javascript:;"
+                @click="articleDetails(item.id)"
+                v-if="item.browseStatus >= 1"
+                style="color:#8e8787"
+              >
+                {{ item.title }}
+              </a>
+              <a href="javascript:;" @click="articleDetails(item.id)" v-else>
+                {{ item.title }}
+              </a>
             </h3>
             <div class="cajr-articles-container">
               <div class="cajr-articles-cover" v-if="item.existBanner">
                 <img :src="item.banner" />
               </div>
               <div class="cajr-articles-content">
-                <div class="articles-content">
-                  {{ item.desc }}
-                </div>
+                <div class="articles-content">{{ item.desc }}</div>
                 <!-- <el-button type="text">阅读全文</el-button> -->
                 <footer class="meta">
                   <div class="actions">
                     <span class="like-views">
                       <i class="icon el-icon-view" style="font-size:18px"></i>
-                      <sup v-if="item.visitorCount <= 998">{{
-                        item.visitorCount
-                      }}</sup>
+                      <sup v-if="item.visitorCount <= 998">
+                        {{ item.visitorCount }}
+                      </sup>
                       <sup v-else>999+</sup>
                     </span>
                     <a href="javascript:;">
@@ -75,9 +83,9 @@
                         class="icon el-icon-chat-dot-square"
                         style="font-size:18px"
                       ></i>
-                      <sup v-if="item.reviewCount <= 998">{{
-                        item.reviewCount
-                      }}</sup>
+                      <sup v-if="item.reviewCount <= 998">
+                        {{ item.reviewCount }}
+                      </sup>
                       <sup v-else>999+</sup>
                     </a>
                   </div>
@@ -112,16 +120,55 @@ export default {
       index: 1,
       init: 10,
       moreInfo: "查看更多内容 >>",
-      page: 1
+      page: 1,
+      isLogin: false,
+      ossImgUrl: ""
     };
   },
   computed: {},
   created() {
-    this.render();
+    this.loginStatus();
+    if (this.isLogin) {
+      this.recommendNews();
+    } else {
+      this.render();
+    }
+    this.ossImgUrl = this.$store.getters.ossImgUrl;
   },
   methods: {
+    loginStatus() {
+      if (localStorage.getItem("isLogin") == "true") {
+        this.isLogin = true;
+      } else {
+        this.isLogin = false;
+      }
+    },
     cajrSelect() {
       this.hiddenBtn = this.hiddenBtn ? false : true;
+    },
+    recommendNews() {
+      let userId = localStorage.getItem("userId");
+      Serve.recommendNewsList(userId, this.page)
+        .then(res => {
+          let data = res.list;
+          for (let i = 0; i < data.length; i++) {
+            this.moreRecommend.push(data[i].news);
+          }
+
+          let init = this.init;
+          let reData = [];
+          for (let i = 0; i < init; i++) {
+            if (data[i] != null) {
+              reData.push(data[i].news);
+            }
+          }
+          this.recommend = reData;
+          this.loading = false;
+          this.count = data.length;
+        })
+        .catch(err => {
+          console.log(err);
+        });
     },
     render() {
       Serve.newestNewsVisitor(this.page)
@@ -149,23 +196,49 @@ export default {
     moreData() {
       this.loading = true;
       this.page++;
-      Serve.newestNewsVisitor(this.page)
-        .then(res => {
-          let data = res.list;
-          if (data.length <= 0) {
-            this.moreInfo = "没有更多了";
-          }
-          let init = this.init;
-          for (let i = 0; i < init; i++) {
-            if (data[i] != null) {
-              this.recommend.push(data[i]);
+      if (this.isLogin) {
+        let userId = localStorage.getItem("userId");
+        Serve.recommendNewsList(userId, this.page)
+          .then(res => {
+            let data = res.list;
+            if (data.length <= 0) {
+              this.moreInfo = "没有更多了";
             }
+            let init = this.init;
+            for (let i = 0; i < init; i++) {
+              if (data[i] != null) {
+                this.recommend.push(data[i].news);
+              }
+            }
+            this.loading = false;
+          })
+          .catch(err => {
+            console.log(err);
+          });
+        Serve.recommend(userId).then(res => {
+          if (res.data === 1) {
+            this.$message.success("触发推荐引擎成功");
           }
-          this.loading = false;
-        })
-        .catch(err => {
-          console.log(err);
         });
+      } else {
+        Serve.newestNewsVisitor(this.page)
+          .then(res => {
+            let data = res.list;
+            if (data.length <= 0) {
+              this.moreInfo = "没有更多了";
+            }
+            let init = this.init;
+            for (let i = 0; i < init; i++) {
+              if (data[i] != null) {
+                this.recommend.push(data[i]);
+              }
+            }
+            this.loading = false;
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
     },
     articleDetails(id) {
       this.$router.push({ path: `/post/${id}` });

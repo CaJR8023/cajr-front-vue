@@ -135,9 +135,9 @@ export default [
   {
     path: "/post/:id",
     name: "Article",
-    meta: { title: "文章详情-cajr" },
+    meta: { title: "详情-cajr" },
     component: Article,
-    title: "文章详情"
+    title: "详情"
   },
   {
     path: "/editor",
@@ -154,7 +154,7 @@ export default [
     title: "test"
   },
   {
-    path: "/search",
+    path: "/search/:key",
     name: "Search",
     meta: { title: "搜索结果-cajr" },
     component: Search,
@@ -164,18 +164,18 @@ export default [
     },
     children: [
       {
-        path: "/search/article",
+        path: "/search/article/:key",
         name: "SearchArticle",
-        meta: { title: "文章搜索结果-cajr" },
+        meta: { title: "搜索文章结果-cajr" },
         component: searchArticle,
-        title: "文章搜索结果"
+        title: "搜索文章结果"
       },
       {
-        path: "/search/user",
+        path: "/search/user/:key",
         name: "SearchUser",
-        meta: { title: "用户搜索结果-cajr" },
+        meta: { title: "搜索用户结果-cajr" },
         component: searchUser,
-        title: "用户搜索结果"
+        title: "搜索用户结果"
       }
     ]
   },

@@ -13,7 +13,8 @@ export default {
   data() {
     return {
       editor: null,
-      info_: null
+      info_: null,
+      ossUrl: ""
     };
   },
   model: {
@@ -42,6 +43,9 @@ export default {
       // 使用 v-model 时，设置初始值
       this.editor.txt.html(val);
     }
+  },
+  created() {
+    this.ossUrl = this.$store.getters.ossImgUrl + "/";
   },
   mounted() {
     this.seteditor();
@@ -87,7 +91,7 @@ export default {
           console.log(result);
 
           // var res = JSON.parseJSON(result);
-          var sourceLink = API.aliyunOss + result.url; //获取上传成功后的文件的Url
+          var sourceLink = this.ossUrl + result.url; //获取上传成功后的文件的Url
 
           // 插入图片到editor
           editor.cmd.do(

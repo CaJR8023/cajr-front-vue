@@ -20,54 +20,66 @@
           </div>
         </div>
       </div>
-      <div class="article-card">
+      <div class="article-card" v-for="item in articleList" :key="item.id">
         <div class="card-box">
           <div class="img-box">
-            <a href="javascript:;" target="_blank">
-              <img src="../assets/zhuanlan.jpg" class="card_img" />
-            </a>
+            <router-link target="_blank" :to="{ path: `/post/` + item.id }">
+              <img :src="item.banner" class="card_img" />
+            </router-link>
           </div>
           <div class="card-content">
-            <a class="pc-card" href="javascript:;" target="_blank">
-              <div class="title text_ellipsis2">刷微博的正确姿势</div>
-            </a>
+            <router-link
+              class="pc-card"
+              target="_blank"
+              :to="{ path: `/post/` + item.id }"
+            >
+              <div class="title text_ellipsis2">{{ item.title }}</div>
+            </router-link>
             <div class="mobile_card">
               <a href="javascript:;" target="_blank">
-                <div class="title text_ellipsis2">刷微博的正确姿势</div>
+                <div class="title text_ellipsis2">{{ item.title }}</div>
               </a>
             </div>
             <div class="bottom-card">
               <div class="left">
                 <div class="pic-box">
-                  <a href="javascript:;" target="_blank">
+                  <router-link
+                    target="_blank"
+                    :to="{ path: `/u/` + item.userOther.id }"
+                  >
                     <img
-                      src="../assets/github.png"
+                      :src="ossUrl + item.userOther.avatar"
                       class="header"
                       lazy="loaded"
                     />
-                  </a>
-                  <a href="javascript:;" target="_blank">
-                    <span class="name">CAJR</span>
-                  </a>
+                  </router-link>
+                  <router-link
+                    target="_blank"
+                    :to="{ path: `/u/` + item.userOther.id }"
+                  >
+                    <span class="name" style="font-size:13px">{{
+                      item.userOther.username
+                    }}</span>
+                  </router-link>
                 </div>
                 <div class="pic-box time" style="margin-left:10px">
-                  <span>3月12日</span>
+                  <span>{{ item.time }}</span>
                 </div>
               </div>
 
               <div class="right">
-                <div class="pic-box ">
+                <div class="pic-box">
                   <i class="el-icon-star-on"></i>
                   <span class="name">4</span>
                 </div>
                 <a
-                  href="javascript:;"
+                  :href="/post/ + item.id"
                   target="_blank"
                   class="pic-box"
                   style="margin-left:20px;"
                 >
                   <i class="el-icon-chat-dot-square"></i>
-                  <span class="name">5</span>
+                  <span class="name">{{ item.reviewCount }}</span>
                 </a>
               </div>
             </div>
@@ -81,11 +93,42 @@
 </template>
 
 <script>
+import Serve from "@/global/request";
 export default {
+  props: ["userId"],
   data() {
     return {
-      loading: false
+      loading: false,
+      articleList: [],
+      userIdReq: {
+        userId: 0
+      },
+      ossUrl: "",
+      moreDataInfo: "加载更多",
+      isNull: false
     };
+  },
+  created() {
+    this.getData();
+    this.ossUrl = this.$store.getters.ossImgUrl;
+    if (this.articleList.length < 1) {
+      this.articleList = "没有更多数据了";
+    }
+  },
+  methods: {
+    getData() {
+      this.userIdReq.userId = this.userId;
+      Serve.userNews(this.userIdReq).then(res => {
+        this.articleList = res.data;
+        let length = this.articleList.length;
+        for (let i = 0; i < length; i++) {
+          if (this.articleList[i].status == 2) {
+            this.articleList[i].banner =
+              this.ossUrl + this.articleList[i].banner;
+          }
+        }
+      });
+    }
   }
 };
 </script>
@@ -214,7 +257,7 @@ a {
               position: absolute;
               left: 50%;
               top: 50%;
-              width: auto;
+              width: 50%;
               height: 100%;
               transform: translate(-50%, -50%);
               min-width: 100%;

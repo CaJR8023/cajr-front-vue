@@ -12,7 +12,7 @@
         <span class="article-cout">文章 {{ item.articles_count }}</span>
       </div>
       <div class="search-user-cardItem-intro">{{ item.intro }}</div>
-      <a class="search-user-btn" href="javascript:;">关注</a>
+      <a class="search-user-btn" href="javascript:;" @click="collect">关注</a>
     </div>
     <div style="clear: both;" />
     <div class="loadingMore">加载更多</div>
@@ -23,14 +23,18 @@
 import Server from "../global/request";
 
 export default {
+  props: ["keyWord"],
   data() {
     return {
       Data: [],
-      followUserData: []
+      followUserData: [],
+      isLogin: false
     };
   },
   created() {
+    this.isLoginStatus();
     this.render();
+    this.search();
   },
   methods: {
     render() {
@@ -39,12 +43,28 @@ export default {
         let data = [];
         for (let i = 0; i < 8; i++) {
           data.push(res.data[i]);
-          console.info(res.data[i]);
         }
         this.followUserData = data;
       });
     },
-    rateBtn() {}
+    isLoginStatus() {
+      if (localStorage.getItem("isLogin") == "true") {
+        this.isLogin = true;
+      } else {
+        this.isLogin = false;
+      }
+    },
+    search() {
+      Server.searchUsers(this.keyWord, this.page).then(res => {
+        console.info(res);
+      });
+    },
+    rateBtn() {},
+    collect() {
+      if (!this.isLogin) {
+        this.$parent.login();
+      }
+    }
   },
   components: {}
 };

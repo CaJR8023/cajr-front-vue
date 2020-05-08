@@ -5,7 +5,7 @@
         <div class="margin-bottom-10">认证手机号</div>
       </div>
       <div class="authPhone-box">
-        <span class="text">15112022009 (已认证)</span>
+        <span class="text">{{ verifyTel }}</span>
         <div class="btn-box">
           <el-button
             size="small"
@@ -34,20 +34,22 @@
         <div v-show="updatePwdShow">
           <div class="update-pwd-box">
             <el-input
-              type="text"
+              type="password"
               class="form-item"
               placeholder="请输入新密码（6 到 16 位）"
               v-model="newPwd"
               size="medium"
+              show-password
             ></el-input>
           </div>
           <div class="update-pwd-box" style="margin-top: 10px;">
             <el-input
-              type="text"
+              type="password"
               class="form-item"
               placeholder="重新输入新密码（6 到 16 位）"
               v-model="newPwd2"
               size="medium"
+              show-password
             ></el-input>
           </div>
           <div class="update-btn-box">
@@ -65,8 +67,13 @@
     >
       <div class="text">为了您的帐号安全，确认身份成功后进行下一步操作</div>
       <div class="form">
-        <el-input v-model="telInput" placeholder="手机号" class="phone-input">
-          <el-select v-model="phoneHeaderValue" slot="prepend">
+        <el-input
+          v-model="resetPasswordForm.tel"
+          placeholder="手机号"
+          class="phone-input"
+          disabled
+        >
+          <el-select v-model="phoneHeaderValue" slot="prepend" disabled>
             <el-option
               v-for="item in phoneHeaderList"
               :key="item.phoneHeaderValue"
@@ -85,7 +92,7 @@
         <el-input
           class="code-input"
           placeholder="输入验证码"
-          v-model="codeInput"
+          v-model="resetPasswordForm.regCode"
         >
           <el-button
             type="text"
@@ -118,9 +125,12 @@
 </template>
 
 <script>
+import Serve from "../global/request";
+
 export default {
   data() {
     return {
+      verifyTel: "",
       phoneDialogVisible: false,
       verificationCodeTitle: "获取验证码",
       codeShow: true,
@@ -161,12 +171,37 @@ export default {
           name: "马来西亚",
           phoneHeaderValue: "+60"
         }
-      ]
+      ],
+      resetPasswordForm: {
+        tel: "",
+        regCode: "",
+        type: "resetPassword"
+      },
+      sendCodeRequest: {
+        mobile: "",
+        type: "resetPassword"
+      },
+      resetPasswordBody: {
+        userId: 0,
+        newPwd: ""
+      }
     };
+  },
+  created() {
+    this.verifyTel = localStorage.getItem("userName");
+    this.resetPasswordForm.tel = this.verifyTel;
+    this.sendCodeRequest.mobile = this.verifyTel;
   },
   methods: {
     sendCode() {
-      this.countDown();
+      Serve.sendCode(this.sendCodeRequest).then(res => {
+        if (res.data === 0) {
+          this.$message.success("发送成功");
+          this.countDown();
+        } else {
+          this.$message.error("发送验证码失败");
+        }
+      });
     },
     countDown() {
       const TIME_COUNT = 30;
@@ -186,11 +221,56 @@ export default {
       }
     },
     verifyCode() {
-      this.updatePwdShow = true;
-      this.phoneDialogVisible = false;
+      if (this.resetPasswordForm.regCode == "") {
+        this.$message.warning("验证码不能为空");
+        return false;
+      }
+      if (
+        this.resetPasswordForm.regCode.length > 4 ||
+        this.resetPasswordForm.regCode.length < 4
+      ) {
+        this.$message.warning("验证码为4位数字");
+        return false;
+      }
+      return Serve.veridyCode(this.resetPasswordForm).then(res => {
+        if (res.data == 1) {
+          this.$message.success("确认身份成功");
+          this.updatePwdShow = true;
+          this.phoneDialogVisible = false;
+          return true;
+        } else {
+          this.$message.warning("验证码错误，请重新发送验证码");
+          return false;
+        }
+      });
     },
     updatePwd() {
-      this.updatePwdShow = false;
+      if (this.newPwd == "" || this.newPwd2 == "") {
+        this.$message.warning("密码输入不能为空!");
+        return;
+      }
+      if (this.newPwd.length < 6 || this.newPwd2.length < 6) {
+        this.$message.warning("密码输入不能少于6位!");
+        return;
+      }
+      if (this.newPwd.length > 16 || this.newPwd2.length > 16) {
+        this.$message.warning("密码输入不能大于16位!");
+        return;
+      }
+      if (this.newPwd != this.newPwd2) {
+        this.$message.warning("两次密码输入不一致!");
+        return;
+      }
+      this.resetPasswordBody.userId = localStorage.getItem("userId") - 0;
+      this.resetPasswordBody.newPwd = this.newPwd2;
+      Serve.resetPwd(this.resetPasswordBody).then(res => {
+        if (res.data == 1) {
+          this.$message.success("修改密码成功");
+          this.updatePwdShow = false;
+          this.$store.dispatch("user/loginOut");
+          this.$router.push({ path: "/" });
+        }
+      });
     }
   }
 };

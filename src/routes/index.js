@@ -21,6 +21,7 @@ appRouter.beforeEach(async (to, _from, next) => {
     localStorage.setItem("userInfo", JSON.stringify(userInfo.data.userInfo));
     localStorage.setItem("user_name", userInfo.data.username);
   }
+  // localStorage.removeItem("token");
   next();
 });
 

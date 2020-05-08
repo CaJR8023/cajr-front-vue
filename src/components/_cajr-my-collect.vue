@@ -20,40 +20,54 @@
           </div>
         </div>
       </div>
-      <div class="article-card">
+      <div class="article-card" v-for="item in newsList" :key="item.id">
         <div class="card-box">
           <div class="img-box">
-            <a href="javascript:;" target="_blank">
-              <img src="../assets/iphone.jpg" class="card_img" />
-            </a>
+            <router-link target="_blank" :to="{ path: `/post/` + item.id }">
+              <img :src="item.banner" class="card_img" />
+            </router-link>
           </div>
           <div class="card-content">
-            <a class="pc-card" href="javascript:;" target="_blank">
+            <router-link
+              class="pc-card"
+              target="_blank"
+              :to="{ path: `/post/` + item.id }"
+            >
               <div class="title text_ellipsis2">
-                iPhone X 触控问题频发，苹果公布显示屏模块免费更换计划
+                {{ item.title }}
               </div>
-            </a>
+            </router-link>
             <div class="mobile_card">
               <a href="javascript:;" target="_blank">
-                <div class="title text_ellipsis2">浏览记录</div>
+                <div class="title text_ellipsis2">
+                  {{ item.title }}
+                </div>
               </a>
             </div>
             <div class="bottom-card">
               <div class="left">
                 <div class="pic-box">
-                  <a href="javascript:;" target="_blank">
+                  <router-link
+                    target="_blank"
+                    :to="{ path: `/u/` + item.userOther.id }"
+                  >
                     <img
-                      src="../assets/github.png"
+                      :src="ossUrl + item.userOther.avatar"
                       class="header"
                       lazy="loaded"
                     />
-                  </a>
-                  <a href="javascript:;" target="_blank">
-                    <span class="name">CAJR</span>
-                  </a>
+                  </router-link>
+                  <router-link
+                    target="_blank"
+                    :to="{ path: `/u/` + item.userOther.id }"
+                  >
+                    <span class="name" style="font-size:13px">{{
+                      item.userOther.username
+                    }}</span>
+                  </router-link>
                 </div>
                 <div class="pic-box time" style="margin-left:10px">
-                  <span>3月12日</span>
+                  <span>{{ item.time }}</span>
                 </div>
               </div>
 
@@ -63,13 +77,13 @@
                   <span class="name">4</span>
                 </div>
                 <a
-                  href="javascript:;"
+                  :href="/post/ + item.id"
                   target="_blank"
                   class="pic-box"
                   style="margin-left:20px;"
                 >
                   <i class="el-icon-chat-dot-square"></i>
-                  <span class="name">5</span>
+                  <span class="name">{{ item.reviewCount }}</span>
                 </a>
               </div>
             </div>
@@ -77,17 +91,41 @@
         </div>
       </div>
       <div style="clear: both;"></div>
-      <div class="loadingMore">加载更多</div>
+      <div class="loadingMore">{{ moreDataInfo }}</div>
     </div>
   </div>
 </template>
 
 <script>
+import Serve from "@/global/request";
 export default {
+  props: ["userId"],
   data() {
     return {
-      loading: false
+      loading: false,
+      newsList: [],
+      userIdReq: {
+        userId: 0
+      },
+      ossUrl: "",
+      moreDataInfo: "加载更多"
     };
+  },
+  created() {
+    console.log(this.userId);
+    this.getData();
+    this.ossUrl = this.$store.getters.ossImgUrl;
+    if (this.newsList.length < 1) {
+      this.moreDataInfo = "没有更多数据了";
+    }
+  },
+  methods: {
+    getData() {
+      this.userIdReq.userId = this.userId;
+      Serve.userCollect(this.userIdReq).then(res => {
+        this.newsList = res.data;
+      });
+    }
   }
 };
 </script>

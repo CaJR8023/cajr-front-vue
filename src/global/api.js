@@ -1,6 +1,6 @@
 const API = "http://yapi.weilaigongzuo.com/mock/441";
 export default {
-  recommend: `${API}/zhihu/recommend`,
+  recommend: userId => `/api/news_rec/user_rec?userId=${userId}`,
   select: `${API}/zhihu/hot-select`,
   hostList: `${API}/zhihu/hot-list`,
   hostListItem: name => `${API}/zhihu/hot-lists/${name}`,
@@ -9,8 +9,10 @@ export default {
   uploadEditorImg: `http://127.0.0.1:5100/img/news/upload`,
   passwordLogin: "/api/oauth/token",
   smsLogin: "/api/sms/login",
-  sendCode: mobile => `/api/code/send?mobile=${mobile}`,
+  sendCode: `/api/code/send`,
   getUserInfo: id => `/api/user/${id}`,
+  getUserInfoByTel: tel => `/api/user/_name?tel=${tel}`,
+  _getUserInfo: id => `/api/visitor/info?id=${id}`,
   verifyCode: `/api/code/verify`,
   register: "/api/user/",
   newestNewsList: page => `/api/visitor/newest?page=${page}`,
@@ -18,5 +20,16 @@ export default {
   getOneTag: id => `/api/tag/${id}`,
   getOneArticle: id => `/api/news/${id}`,
   get24HoursNews: "/api/news/hot_24_hours",
-  getReview: id => `/api/review/news?newsId=${id}`
+  getReview: id => `/api/review/news?newsId=${id}`,
+  newsLogs: "/api/news_logs/",
+  userInfo: "/api/user_info/",
+  resetPassword: "/api/user/reset_pwd",
+  postNews: "/api/news/",
+  userNewsLogs: "/api/news_logs/user",
+  userNews: "/api/news/my",
+  userReview: "/api/review/user",
+  userCollect: "/api/collect/news",
+  userFollow: "/api/follow/followed_users",
+  postReview: "/api/review/",
+  postReply: "/api/reply/"
 };

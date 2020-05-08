@@ -21,7 +21,7 @@
           </div>
         </div>
         <div class="setting-container">
-          <router-view />
+          <router-view :data="userInfo"></router-view>
         </div>
       </div>
     </div>
@@ -38,10 +38,12 @@ export default {
   data() {
     return {
       userId: 0,
+      userInfo: "",
       navlist: []
     };
   },
   created() {
+    this.userInfo = localStorage.getItem("userInfo");
     this.getUserId();
     this.navlist = Router[3].children;
   },

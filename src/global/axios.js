@@ -37,10 +37,10 @@ axios.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          store.commit("DEL_TOKEN");
-          Message.warning("登录已过期，请重新登录");
+          store.dispatch("user/loginOut");
+          this.$message.warning("登录已过期，请重新登录");
           router.replace({
-            path: "/"
+            path: "/home"
           });
           break;
         case 500:
@@ -64,8 +64,6 @@ axios.interceptors.response.use(
 
 export default {
   post: function(url = "", data = {}, config) {
-    console.info(url);
-
     return axios.post(url, data, config);
   },
 

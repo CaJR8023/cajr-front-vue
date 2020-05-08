@@ -1,29 +1,35 @@
 <template>
   <div style="height:100%;">
-    <cajr-header />
+    <cajr-header ref="header" />
     <div class="user-page">
       <div class="user-content">
         <div class="user-info-box">
           <div class="portrait">
             <div class="cajr-portrait" style="height: 100px;">
               <img
-                src="../assets/github.png"
+                :src="avatar"
                 style="width: 100px; height: 100px; border-radius: 100px;"
               />
             </div>
           </div>
           <div class="cont">
-            <div class="name">CAJR</div>
-            <div class="summary">还没有介绍自己</div>
+            <div class="name">{{ userInfo.username }}</div>
+            <div
+              class="summary"
+              v-if="userInfo.signature != null && userInfo.signature != ''"
+            >
+              {{ userInfo.signature }}
+            </div>
+            <div class="summary" v-else>还没有介绍自己</div>
           </div>
           <div class="follow-box">
             <a href="javascript:;"
               >关注
-              <span class="count">11</span>
+              <span class="count">{{ userInfo.followNum }}</span>
             </a>
             <a href="javascript:;"
               >粉丝
-              <span class="count">0</span>
+              <span class="count">{{ userInfo.followedNum }}</span>
             </a>
           </div>
           <div class="button-box">
@@ -37,6 +43,16 @@
                 style="background: #fff;"
                 round
                 >编辑</el-button
+              >
+              <el-button
+                type="button"
+                v-else
+                @click="followBtn"
+                class="cajr-default cajr-small"
+                size="mini"
+                style="background: #fff;"
+                round
+                >{{ followInfo }}</el-button
               >
             </div>
           </div>
@@ -53,7 +69,7 @@
           </div>
         </div>
         <div class="user-tabs-box-container" style="width: 800px; ">
-          <router-view></router-view>
+          <router-view :userId="userId"></router-view>
         </div>
       </div>
     </div>
@@ -65,7 +81,7 @@
 import cajrHeader from "./../components/_cajr-header";
 import cajrFooter from "./../components/_cajr-footer";
 import Router from "./../routes/router";
-import Server from "../global/request";
+import Serve from "../global/request";
 
 export default {
   data() {
@@ -75,30 +91,54 @@ export default {
       followUserData: [],
       index: 1,
       isMyself: false,
-      isLogin: false
+      isLogin: false,
+      userInfo: "",
+      avatar: "",
+      followInfo: "",
+      userId: 0,
+      isFollow: 0
     };
   },
   created() {
+    this.userId = this.$route.params.id;
     this.loginStatus();
+    this.getUserData();
     this.render();
     this.navlist = Router[2].children;
+    this.followStatus();
   },
   methods: {
+    getUserData() {
+      Serve._getUserInfo(this.$route.params.id).then(res => {
+        this.userInfo = res.data;
+        this.isFollow = res.data.isFollow;
+        this.avatar = this.$store.getters.ossImgUrl + this.userInfo.avatar;
+      });
+    },
     loginStatus() {
       if (localStorage.getItem("isLogin") == "true") {
         this.isLogin = true;
-        this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        console.log(this.userInfo);
-        this.avatar = this.$store.getters.ossImgUrl + this.userInfo.avatar;
-        this.isMyself = this.$route.params.id = localStorage.getItem("userId")
+        // this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        // this.avatar = this.$store.getters.ossImgUrl + this.userInfo.avatar;
+        // eslint-disable-next-line no-unused-vars
+        let userId = this.$route.params.id;
+        // eslint-disable-next-line no-cond-assign
+        this.isMyself = (userId = localStorage.getItem("userId"))
           ? true
           : false;
       } else {
         this.isLogin = false;
       }
     },
+    followStatus() {
+      if (this.isFollow === 1) {
+        this.followInfo = "已关注";
+      } else {
+        this.followInfo = "关注";
+      }
+    },
     render() {
-      Server.zhuanlanCard().then(res => {
+      Serve.zhuanlanCard().then(res => {
         this.Data = res.data;
         let data = [];
         for (let i = 0; i < 12; i++) {
@@ -107,9 +147,15 @@ export default {
         this.followUserData = data;
       });
     },
-    rateBtn() {},
     editBtn() {
       this.$router.push({ name: "Setting", params: { userId: 1 } });
+    },
+    followBtn() {
+      if (!this.isLogin) {
+        this.$refs.header._isLoginDialogShow();
+        // eslint-disable-next-line no-empty
+      } else {
+      }
     }
   },
   components: {

@@ -12,6 +12,7 @@
               <el-upload
                 action="http://127.0.0.1:5100/img/news/upload"
                 ref="upload"
+                name="file"
                 drag
                 accept="image/jpeg, image/gif, image/png"
                 list-type="picture"
@@ -19,7 +20,6 @@
                 :on-success="uploadSuccessMsg"
                 :on-exceed="handleExceed"
                 :before-upload="beforeBannerUpload"
-                :auto-upload="false"
                 :on-preview="handlePictureCardPreview"
                 :limit="1"
               >
@@ -48,7 +48,7 @@
                 type="textarea"
                 :rows="2"
                 placeholder="请输入内容"
-                v-model="articleTitle"
+                v-model="articleForm.title"
               ></el-input>
             </div>
           </div>
@@ -70,7 +70,7 @@
             <div class="textarea-wrap text">
               <el-tag
                 :key="tag"
-                v-for="tag in articleTags"
+                v-for="tag in articleForm.tags"
                 closable
                 :disable-transitions="false"
                 @close="handleClose(tag)"
@@ -97,8 +97,8 @@
             </div>
           </div>
           <div class="form-submit">
-            <el-button class="save-btn" round>保存</el-button>
-            <el-button class="release-btn" round>发布</el-button>
+            <el-button class="save-btn" @click="save1" round>保存</el-button>
+            <el-button class="release-btn" @click="save" round>发布</el-button>
           </div>
         </form>
       </div>
@@ -111,6 +111,8 @@
 import cajrHeader from "./../components/_cajr-header";
 import cajrFooter from "./../components/_cajr-footer";
 import Editor from "../components/_cajr-editor";
+import Serve from "../global/request";
+
 export default {
   data() {
     return {
@@ -120,20 +122,31 @@ export default {
       articleTags: [],
       inputVisible: false,
       inputValue: "",
-      isClear: false
+      isClear: false,
+      articleForm: {
+        userId: 0,
+        title: "",
+        banner: "",
+        allContent: "",
+        tags: [],
+        status: 0
+      }
     };
+  },
+  created() {
+    this.articleForm.userId = localStorage.getItem("userId");
   },
   methods: {
     handleInputConfirm() {
       let inputValue = this.inputValue;
       if (inputValue) {
-        this.articleTags.push(inputValue);
+        this.articleForm.tags.push(inputValue);
       }
       this.inputVisible = false;
       this.inputValue = "";
     },
     handleClose(tag) {
-      this.articleTags.splice(this.articleTags.indexOf(tag), 1);
+      this.articleForm.tags.splice(this.articleForm.tags.indexOf(tag), 1);
     },
     showInput() {
       this.inputVisible = true;
@@ -143,9 +156,9 @@ export default {
       });
     },
     beforeBannerUpload(file) {
-      const isLt2M = file.size / 1024 / 1024 < 5;
+      const isLt2M = file.size / 1024 / 1024 < 10;
       if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 5MB!");
+        this.$message.error("上传头像图片大小不能超过 10MB!");
         return false;
       }
       return isLt2M;
@@ -167,28 +180,32 @@ export default {
     },
     // eslint-disable-next-line no-unused-vars
     uploadSuccessMsg(response, file, fileList) {
+      this.articleForm.banner = "/" + response.url;
       this.$message.success("图片上传成功");
     },
-    uploadFile() {
-      this.$refs.upload.submit();
-      /*
-      let formData = new FormData()
-      formData.append('file', this.form.file)
-      axios.post('https://jsonplaceholder.typicode.com/posts/', 
-        formData,
-        { "Content-Type": "multipart/form-data" }
-      )
-      .then(res => {
-        console.log('res')
-        console.log(res)
-      })
-      .catch(err => {
-
-      })
-      */
-    },
+    uploadFile() {},
     changeArticle(html) {
       console.log(html);
+      this.articleForm.allContent = html;
+    },
+    save() {
+      console.log(this.articleForm);
+      if (this.articleForm.title == "") {
+        this.$message.error("标题不能为空！");
+        return;
+      }
+      if (this.articleForm.allContent == "") {
+        this.$message.error("内容不能为空！");
+        return;
+      }
+      Serve.postNews(this.articleForm).then(res => {
+        if (res.data >= 1) {
+          this.$message.success("保存成功");
+        }
+      });
+    },
+    save1() {
+      this.$message.warning("该功能还没开发");
     }
   },
   components: {

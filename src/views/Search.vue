@@ -1,10 +1,10 @@
 <template>
   <div>
-    <cajr-header></cajr-header>
+    <cajr-header ref="articleHeader"></cajr-header>
     <div class="search-page">
       <div class="search-head">
         <el-input class="search-input" v-model="searchInput">
-          <i slot="suffix" class="icon icon-search-black"></i>
+          <i slot="suffix" class="icon icon-search-black" @click="query"></i>
         </el-input>
         <div class="tabs-box">
           <div class="search-nav text-align-center">
@@ -18,7 +18,7 @@
           </div>
         </div>
       </div>
-      <router-view></router-view>
+      <router-view :searchInput="searchInput" ref="search"></router-view>
     </div>
     <cajr-footer></cajr-footer>
     <el-backtop :bottom="80"></el-backtop>
@@ -38,7 +38,18 @@ export default {
     };
   },
   created() {
+    this.searchInput = this.$route.params.key;
     this.navlist = Router[7].children;
+  },
+  methods: {
+    query() {
+      this.$refs.search.search();
+      let key = this.searchInput;
+      this.$router.push({ path: `/search/${key}` });
+    },
+    login() {
+      this.$refs.articleHeader._isLoginDialogShow();
+    }
   },
   components: {
     "cajr-header": cajrHeader,

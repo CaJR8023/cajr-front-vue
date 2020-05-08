@@ -29,7 +29,7 @@
       </div>
     </div>
     <div class="cajr-asider-24hour">
-      <div class="cajr-24hour-title">24小时热闻</div>
+      <div class="cajr-24hour-title">国内热闻</div>
       <div class="block">
         <el-carousel
           height="150px"

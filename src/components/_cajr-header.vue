@@ -28,26 +28,20 @@
         >
       </div>
       <div class="cajr-header-select">
-        <el-autocomplete
+        <el-input
           popper-class="my-autocomplete"
           v-model="selectValue"
-          :fetch-suggestions="querySearch"
           :placeholder="placeholder"
           @focus="cajrSelect"
           :class="[hiddenBtn ? 'cajr-header-select-input' : '']"
           @blur="cajrSelect"
-          @select="handleSelect"
         >
           <i
             class="el-icon-edit el-input__icon"
             slot="suffix"
             @click="handleIconClick"
           ></i>
-          <template slot-scope="{ item }">
-            <div class="name">{{ item.query }}</div>
-            <span class="addr">{{ item.display_query }}</span>
-          </template>
-        </el-autocomplete>
+        </el-input>
         <ElButton
           type="primary"
           icon="el-icon-search"
@@ -68,17 +62,21 @@
         ></ElButton>
         <el-dropdown v-else v-show="!hiddenBtn">
           <a href>
-            <el-avatar :size="32" style="margin-left:8px" :src="avatarUrl" />
+            <el-avatar
+              :size="32"
+              style="margin-left:8px; background: #fff;"
+              :src="avatarUrl"
+            />
           </a>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>
-              <a @click="user(userInfo.userId)">个人中心</a>
+              <a :href="/u/ + userInfo.userId">个人中心</a>
             </el-dropdown-item>
             <el-dropdown-item>
-              <a @click="goMyAttention(userInfo.userId)">我的关注</a>
+              <a :href="/u/ + userInfo.userId + /follow/">我的关注</a>
             </el-dropdown-item>
             <el-dropdown-item>
-              <a @click="goMyReview(userInfo.userId)">我的评论</a>
+              <a :href="/u/ + userInfo.userId + /review/">我的评论</a>
             </el-dropdown-item>
             <el-dropdown-item>
               <a @click="loginOut">退出登陆</a>
@@ -427,7 +425,7 @@ export default {
       selectData: [],
       navlist: [],
       selectValue: "",
-      placeholder: "",
+      placeholder: "搜索新闻或用户",
       headerHeight: 52,
       scrollHeight: 0,
       isActive: true,
@@ -502,7 +500,8 @@ export default {
         tel: "",
         password: "",
         rePassword: "",
-        regCode: ""
+        regCode: "",
+        type: "login"
       },
       userRules: {
         username: [
@@ -517,7 +516,11 @@ export default {
           { required: true, message: "请再次输入密码", trigger: "blur" }
         ]
       },
-      userInfo: {}
+      userInfo: {},
+      sendCodeRequest: {
+        mobile: "",
+        type: "login"
+      }
     };
   },
   created() {
@@ -529,21 +532,15 @@ export default {
     window.addEventListener("scroll", this.getScroll);
   },
   methods: {
-    render() {
-      Serve.select().then(res => {
-        let selectData = res.top_search.words;
-        this.selectData = selectData;
-        let index = Math.floor(Math.random() * selectData.length);
-        this.placeholder = selectData[index].display_query;
-        this.selectData = this.loadAll();
-      });
-    },
+    render() {},
     isLoginStatus() {
       if (localStorage.getItem("isLogin") == "true") {
         this.isLogin = true;
         this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
         console.log(this.userInfo);
-        this.avatarUrl = this.$store.getters.ossImgUrl + this.userInfo.avatar;
+        if (this.userInfo != null) {
+          this.avatarUrl = this.$store.getters.ossImgUrl + this.userInfo.avatar;
+        }
       } else {
         this.isLogin = false;
       }
@@ -596,10 +593,10 @@ export default {
       }
     },
     query() {
-      this.$router.push({ path: "/search" });
+      let key = this.selectValue;
+      this.$router.push({ path: `/search/${key}` });
     },
     user(id) {
-      console.log(id);
       this.$router.push({ path: `/u/${id}` });
     },
     goMyAttention(userId) {
@@ -619,13 +616,13 @@ export default {
           this.$message.warning("请输入正确的手机号");
           return false;
         }
-
-        this.sendCode(this.smsLoginForm.mobile);
+        this.sendCodeRequest.mobile = this.smsLoginForm.mobile;
+        this.sendCode(this.sendCodeRequest);
       }
     },
     sendCode(data) {
       Serve.sendCode(data).then(res => {
-        if (res.data === 1) {
+        if (res.data === 0) {
           this.$message.success("发送成功");
           this.countDownLogin();
         } else {
@@ -658,8 +655,19 @@ export default {
           this.$message.warning("请输入正确的手机号");
           return false;
         }
-        this.sendCode(this.userForm.tel);
+        this.sendCodeRequest.mobile = this.userForm.tel;
+        this.sendRegCode(this.sendCodeRequest);
       }
+    },
+    sendRegCode(data) {
+      Serve.sendCode(data).then(res => {
+        if (res.data === 0) {
+          this.$message.success("发送成功");
+          this.countDownReg();
+        } else {
+          this.$message.error("发送验证码失败");
+        }
+      });
     },
     countDownReg() {
       const TIME_COUNT = 60;
@@ -712,11 +720,11 @@ export default {
         .dispatch("user/_passwordLogin", this.passwordLoginForm)
         // eslint-disable-next-line no-unused-vars
         .then(async res => {
-          this.$message.success("登录成功!");
           const isGetUserInfo = await this._getUserInfo(
             this.passwordLoginForm.username
           );
           if (isGetUserInfo) {
+            this.$message.success("登录成功!");
             this.isDialogShow = false;
             this.isLogin = true;
             this.$router.go(0);
@@ -752,11 +760,11 @@ export default {
       this.isLogin = false;
     },
     _getUserInfo(data) {
-      return Serve.getUserInfo(data)
+      return Serve.getInfoByTel(data)
         .then(res => {
           console.info(res.data);
           localStorage.setItem("userId", res.data.id);
-          localStorage.setItem("userName", res.data.id);
+          localStorage.setItem("userName", res.data.tel);
           localStorage.setItem("isLogin", true);
           return true;
         })

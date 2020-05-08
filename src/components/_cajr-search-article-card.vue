@@ -20,86 +20,123 @@
           </div>
         </div>
       </div>
-      <div class="article-card">
-        <div class="card-box">
-          <div class="img-box">
-            <a href="javascript:;" target="_blank">
-              <img src="../assets/zhuanlan.jpg" class="card_img" />
-            </a>
-          </div>
-          <div class="card-content">
-            <a class="pc-card" href="javascript:;" target="_blank">
-              <div class="title text_ellipsis2">刷微博的正确姿势</div>
-            </a>
-            <div class="mobile_card">
-              <a href="javascript:;" target="_blank">
-                <div class="title text_ellipsis2">刷微博的正确姿势</div>
-              </a>
+      <div v-if="searchNewsData.length > 0">
+        <div class="article-card" v-for="item in searchNewsData" :key="item.id">
+          <div class="card-box">
+            <div class="img-box">
+              <router-link target="_blank" :to="{ path: `/post/` + item.id }">
+                <img :src="item.banner" class="card_img" />
+              </router-link>
             </div>
-            <div class="bottom-card">
-              <div class="left">
-                <div class="pic-box">
-                  <a href="javascript:;" target="_blank">
-                    <img
-                      src="../assets/github.png"
-                      class="header"
-                      lazy="loaded"
-                    />
-                  </a>
-                  <a href="javascript:;" target="_blank">
-                    <span class="name">CAJR</span>
-                  </a>
-                </div>
-                <div class="pic-box time" style="margin-left:10px">
-                  <span>3月12日</span>
-                </div>
-                <i
-                  class="el-icon-star-on"
-                  style="margin-left: 75px;font-size: 18px;"
-                ></i>
-                <span class="name">4</span>
-              </div>
-              <a
-                href="javascript:;"
+            <div class="card-content">
+              <router-link
+                class="pc-card"
                 target="_blank"
-                class="pic-box"
-                style="margin-left:20px;"
+                :to="{ path: `/post/` + item.id }"
               >
-                <i class="el-icon-chat-dot-square" style="font-size: 18px;"></i>
-                <span class="name">5</span>
-              </a>
-            </div>
-
-            <!-- <div class="right">
-                <div class="pic-box ">
-                  <i class="el-icon-star-on"></i>
-                  <span class="name">4</span>
-                </div>
-                <a
-                  href="javascript:;"
-                  target="_blank"
-                  class="pic-box"
-                  style="margin-left:20px;"
-                >
-                  <i class="el-icon-chat-dot-square"></i>
-                  <span class="name">5</span>
+                <div class="title text_ellipsis2">{{ item.title }}</div>
+              </router-link>
+              <div class="mobile_card">
+                <a href="javascript:;" target="_blank">
+                  <div class="title text_ellipsis2"></div>
                 </a>
-            </div>-->
+              </div>
+              <div class="bottom-card">
+                <div class="left">
+                  <div class="pic-box">
+                    <a href="javascript:;" target="_blank">
+                      <img
+                        :src="OSSUrl + item.userOther.avatar"
+                        class="header"
+                        lazy="loaded"
+                      />
+                    </a>
+                    <a href="javascript:;" target="_blank">
+                      <span class="name" style="font-size: 13px;">{{
+                        item.userOther.username
+                      }}</span>
+                    </a>
+                  </div>
+                  <div class="pic-box time" style="margin-left:10px">
+                    <span>{{ item.time }}</span>
+                  </div>
+                  <i
+                    class="el-icon-star-on"
+                    style="margin-left: 65px;font-size: 18px; color: #ffa902;"
+                  ></i>
+                  <span class="name" style="color:#8e8787;">{{
+                    item.reviewCount
+                  }}</span>
+                </div>
+                <router-link
+                  class="pic-box"
+                  target="_blank"
+                  :to="{ path: `/post/` + item.id }"
+                  style="margin-left: 20px;"
+                >
+                  <i
+                    class="el-icon-chat-dot-square"
+                    style="font-size: 18px;"
+                  ></i>
+                  <span class="name">{{ item.reviewCount }}</span>
+                </router-link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <div class="no-data" v-else></div>
     </div>
     <div style="clear: both;"></div>
-    <div class="loadingMore">加载更多</div>
+    <div class="loadingMore">
+      <a href="javascript:;" @click="loadingMore" v-if="moreStatus">加载更多</a>
+      <a href="javascript:;" v-else disabled="!moreStatus">没有更多了</a>
+    </div>
   </div>
 </template>
 
 <script>
+import Serve from "../global/request";
+
 export default {
+  props: ["keyWord"],
   data() {
     return {
-      loading: false
+      searchNewsData: [],
+      loading: false,
+      page: 1,
+      moreStatus: true,
+      OSSUrl: ""
     };
+  },
+  created() {
+    this.search();
+    this.OSSUrl = this.$store.getters.ossImgUrl;
+  },
+  methods: {
+    search() {
+      this.page = 1;
+      this.moreStatus = true;
+      Serve.searchNews(this.keyWord, this.page).then(res => {
+        this.searchNewsData = res.list;
+      });
+    },
+    loadingMore() {
+      this.page++;
+      Serve.searchNews(this.keyWord, this.page).then(res => {
+        let data = res.list;
+        if (data.length <= 0) {
+          this.$message.warning("没有更多了");
+          this.moreStatus = false;
+        }
+        for (let i = 0; i < res.list.length; i++) {
+          this.searchNewsData.push(res.list[i]);
+        }
+      });
+    },
+    articleDetails(id) {
+      this.$router.push({ path: `/post/${id}` });
+    }
   }
 };
 </script>
@@ -222,13 +259,13 @@ a {
             color: #292525;
             -webkit-tap-highlight-color: transparent;
             &:hover {
-              color: #292525;
+              color: red;
             }
             img {
               position: absolute;
               left: 50%;
               top: 50%;
-              width: auto;
+              width: 50%;
               height: 100%;
               transform: translate(-50%, -50%);
               min-width: 100%;

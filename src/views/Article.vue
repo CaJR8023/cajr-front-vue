@@ -27,13 +27,15 @@
                     <div class="cajr-portrait avatar" style="height: 32px">
                       <a href="javascript:;" target="_blank">
                         <img
-                          src="../assets/github.png"
+                          :src="ossImgUrl + newsData.userOther.avatar"
                           style="width:32px; height:32px; border-radius:32px;"
                         />
                       </a>
                     </div>
                     <a href="javascript:;" target="_blank">
-                      <span class="nickname">{{ newsData.source }}</span>
+                      <span class="nickname">{{
+                        newsData.userOther.username
+                      }}</span>
                     </a>
                   </div>
                 </div>
@@ -43,10 +45,17 @@
           </div>
           <div class="article-body" id="aBody">
             <div class="articleWidth-content">
-              <div class="content wangEditor-txt minHeight">
+              <div class="content wangEditor-txt minHeight" v-if="!isHtml">
                 <p v-for="item in newsContent" :key="item" v-html="item">
                   {{ item }}
                 </p>
+              </div>
+              <div
+                class="content wangEditor-txt minHeight"
+                v-else
+                v-html="newsContentHtml"
+              >
+                {{ newsContentHtml }}
               </div>
             </div>
             <div style="border: 1px solid transparent;"></div>
@@ -83,7 +92,8 @@
             <div class="tag-container">
               <div class="tag-item" v-for="tag in tags" :key="tag">
                 <a href="javascript:;" class="tag">
-                  <span class="sub">#</span>{{ tag }}
+                  <span class="sub">#</span>
+                  {{ tag }}
                 </a>
               </div>
             </div>
@@ -101,7 +111,7 @@
                   <div class="cajr-portrait avatar" style="height: 32px">
                     <a href="javascript:;" target="_blank">
                       <img
-                        src="../assets/github.png"
+                        :src="ossImgUrl + newsData.userOther.avatar"
                         style="width:32px; height:32px; border-radius:32px;"
                       />
                     </a>
@@ -109,10 +119,18 @@
                   <div class="container">
                     <div class="top">
                       <a href="javascript:;" target="_blank">
-                        <span class="nickname">{{ newsData.source }}</span>
+                        <span class="nickname">{{
+                          newsData.userOther.username
+                        }}</span>
                       </a>
                     </div>
-                    <div class="bio">这个人很懒～</div>
+                    <div
+                      class="bio"
+                      v-if="newsData.userOther.signature != null"
+                    >
+                      {{ newsData.userOther.signature }}
+                    </div>
+                    <div class="bio" v-else>这个人很懒～</div>
                     <div class="btn-box left-4">
                       <el-button size="mini" @click="follow">关 注</el-button>
                     </div>
@@ -167,7 +185,8 @@
                         写下你的评论
                       </div>
                       <div class="txt input-txt" v-else>
-                        请在<a
+                        请在
+                        <a
                           href="javascript:;"
                           style="color:red;"
                           @click="commentStatus"
@@ -182,6 +201,7 @@
                       <textarea
                         id="commentTextArea"
                         name="comment"
+                        v-model="reviewForm.content"
                         class="textarea textarea-0"
                         @blur.prevent="isShowCommentBox = false"
                       ></textarea>
@@ -248,9 +268,9 @@
                                 class="el-icon-chat-round"
                                 @click="showCallTextArea"
                               ></i>
-                              <span class="name">{{
-                                review.replyList.length
-                              }}</span>
+                              <span class="name">
+                                {{ review.replyList.length }}
+                              </span>
                             </div>
                             <div class="pic-box">
                               <i
@@ -295,9 +315,9 @@
                           <div class="user-box">
                             <div class="between">
                               <div class="flex-start">
-                                <a class="name">{{
-                                  reply.userOther.username
-                                }}</a>
+                                <a class="name">
+                                  {{ reply.userOther.username }}
+                                </a>
                                 <div v-if="reply.repliedUserOther.id > 0">
                                   &nbsp;
                                   <span class="txt">回复</span> &nbsp;
@@ -305,8 +325,8 @@
                                     class="txt"
                                     href="javascript:;"
                                     target="_blank"
-                                    >{{ reply.repliedUserOther.username }}
-                                  </a>
+                                    >{{ reply.repliedUserOther.username }}</a
+                                  >
                                 </div>
                               </div>
                             </div>
@@ -339,9 +359,9 @@
                                 </div>
                                 <div class="pic-box">
                                   <i class="el-icon-caret-bottom"></i>
-                                  <span class="name">{{
-                                    reply.unlikeNum
-                                  }}</span>
+                                  <span class="name">
+                                    {{ reply.unlikeNum }}
+                                  </span>
                                 </div>
                               </div>
                               <div class="pic-box">
@@ -369,7 +389,7 @@
                                 >
                                   <a href="javascript:;" target="_blank">
                                     <img
-                                      src="../assets/github.png"
+                                      :src="ossImgUrl + userInfo.avatar"
                                       style="width:32px; height:32px; border-radius:32px;"
                                     />
                                   </a>
@@ -380,7 +400,8 @@
                                   class="name"
                                   href="javascript:;"
                                   target="_blank"
-                                  >CAJR</a
+                                  style="font-size: 14px;"
+                                  >{{ userInfo.userName }}</a
                                 >
                                 <div>
                                   &nbsp;
@@ -389,7 +410,7 @@
                                     class="txt"
                                     href="javascript:;"
                                     target="_blank"
-                                    >CAJR</a
+                                    >{{ review.userOther.username }}</a
                                   >
                                 </div>
                               </div>
@@ -401,11 +422,17 @@
                               <textarea
                                 id="callTextArea"
                                 name="comment"
+                                v-model="replyForm.content"
                                 class="textarea textarea-0"
                                 @blur.prevent="isShowCall = false"
                               ></textarea>
                               <div class="handle-box">
-                                <el-button size="mini" round>回复</el-button>
+                                <el-button
+                                  size="mini"
+                                  @click="reply(review.userOther.id, review.id)"
+                                  round
+                                  >回复</el-button
+                                >
                               </div>
                             </div>
                           </div>
@@ -451,11 +478,29 @@ export default {
       avatar: "",
       isLogin: false,
       reviewData: [],
-      ossImgUrl: ""
+      ossImgUrl: "",
+      newslog: {
+        userId: 0,
+        newsId: 0
+      },
+      newsContentHtml: "",
+      isHtml: false,
+      reviewForm: {
+        newsId: 0,
+        userId: 0,
+        content: ""
+      },
+      replyForm: {
+        repliedUserId: 0,
+        reviewId: 0,
+        userId: 0,
+        content: ""
+      }
     };
   },
   created() {
     this.loginStatus();
+    this.newsLogs();
     this.newsDetails();
     this.getNewsReview();
     this.render();
@@ -469,16 +514,34 @@ export default {
       if (localStorage.getItem("isLogin") == "true") {
         this.isLogin = true;
         this.userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        console.log(this.userInfo);
+        this.userInfo.userName = localStorage.getItem("user_name");
         this.avatar = this.$store.getters.ossImgUrl + this.userInfo.avatar;
       } else {
         this.isLogin = false;
       }
     },
+    newsLogs() {
+      if (this.isLogin) {
+        let userId = localStorage.getItem("userId");
+        let newsId = this.$route.params.id;
+        this.newslog.userId = userId;
+        this.newslog.newsId = newsId;
+        Serve.newsLogs(this.newslog).then(res => {
+          console.info(res);
+        });
+      }
+    },
     newsDetails() {
       Serve.getOneNews(this.$route.params.id).then(res => {
         this.newsData = res;
-        this.newsContent = res.contentList;
+        if (res.status == 1) {
+          this.isHtml = false;
+          this.newsContent = res.contentList;
+        } else {
+          this.newsData.banner = this.ossImgUrl + res.banner;
+          this.isHtml = true;
+          this.newsContentHtml = res.allContent;
+        }
         this.isBanner = res.existBanner;
         this.tags = res.tags;
       });
@@ -555,6 +618,29 @@ export default {
     review() {
       // eslint-disable-next-line no-empty
       if (this.isLogin) {
+        this.reviewForm.userId = this.userInfo.id;
+        this.reviewForm.newsId = this.$route.params.id;
+        Serve.postReview(this.reviewForm).then(res => {
+          if (res.data == 1) {
+            this.$router.go(0);
+            document.getElementById("callTextArea").focus();
+          }
+        });
+      } else {
+        this.$refs.articleHeader._isLoginDialogShow();
+      }
+    },
+    reply(repliedUserId, reviewId) {
+      if (this.isLogin) {
+        this.replyForm.userId = this.userInfo.id;
+        this.replyForm.repliedUserId = repliedUserId;
+        this.replyForm.reviewId = reviewId;
+        Serve.postReply(this.replyForm).then(res => {
+          if (res.data == 1) {
+            this.$router.go(0);
+            document.getElementById("callTextArea").focus();
+          }
+        });
       } else {
         this.$refs.articleHeader._isLoginDialogShow();
       }
@@ -728,8 +814,6 @@ a {
           -webkit-box-flex: 1;
           -ms-flex: 1;
           flex: 1;
-          .top {
-          }
         }
       }
     }
@@ -946,8 +1030,6 @@ img {
       color: #655e5e;
       text-align: center;
       position: relative;
-      .comment-title {
-      }
       .review-box {
         position: absolute;
         font-size: 14px;

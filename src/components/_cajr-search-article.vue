@@ -2,7 +2,10 @@
   <div class="search-container">
     <div class="search-content">
       <div class="article">
-        <cajr-article-card></cajr-article-card>
+        <cajr-article-card
+          :keyWord="searchInput"
+          ref="searchArticle"
+        ></cajr-article-card>
       </div>
       <div class="right">
         <div class="cajr-recommend-tag">
@@ -86,10 +89,19 @@
 
 <script>
 import cajrArticleCard from "./../components/_cajr-search-article-card";
+// eslint-disable-next-line no-unused-vars
+import Serve from "../global/request";
 
 export default {
+  props: ["searchInput"],
   data() {
     return {};
+  },
+  created() {},
+  methods: {
+    search() {
+      this.$refs.searchArticle.search();
+    }
   },
   components: {
     "cajr-article-card": cajrArticleCard
